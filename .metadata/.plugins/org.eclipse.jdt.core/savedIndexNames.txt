@@ -1,4 +1,0 @@
-INDEX VERSION 1.134+/Users/eunseo/Documents/2025/1학기/데이터베이스/poppop/.metadata/.plugins/org.eclipse.jdt.core
-1865797976.index
-964146638.index
-648584848.index

@@ -51,3 +51,16 @@ application-*.properties
 .DS_Store
 Thumbs.db
 * text=auto
+
+# Eclipse
+.metadata/
+.settings/
+bin/
+*.log
+*.tmp
+*.bak
+*.swp
+*.zip
+*.ser
+*.class
+.DS_Store
