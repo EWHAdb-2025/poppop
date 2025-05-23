@@ -2,8 +2,8 @@ package db2025.DB2025Team05_poppop.DB2025Team05_service;
 
 import db2025.DB2025Team05_poppop.DB2025Team05_common.ErrorCode;
 import db2025.DB2025Team05_poppop.DB2025Team05_common.Role;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_POPUP_MANAGEMENT;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_USER;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.PopupManagement;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.User;
 import db2025.DB2025Team05_poppop.DB2025Team05_exception.BusinessException;
 import db2025.DB2025Team05_poppop.DB2025Team05_repository.PopupRepository;
 import db2025.DB2025Team05_poppop.DB2025Team05_repository.UserRepository;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -71,13 +72,13 @@ public class PopupStoreService {
      * @throws BusinessException 권한 없음, 입력값 검증 실패, 저장 실패 시 발생
      */
     @Transactional
-    public DB2025_POPUP_MANAGEMENT registerPopupStore(DB2025_POPUP_MANAGEMENT popup, int userId) {
+    public PopupManagement registerPopupStore(PopupManagement popup, int userId) {
         try {
             validateProducerPermission(userId);
             validatePopupInput(popup);
             
             popup.setUserId(userId);
-            DB2025_POPUP_MANAGEMENT savedPopup = popupRepository.insertPopup(popup);
+            PopupManagement savedPopup = popupRepository.insertPopup(popup);
             if (savedPopup == null) {
                 throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "팝업스토어 등록에 실패했습니다.");
             }
@@ -104,10 +105,10 @@ public class PopupStoreService {
      * @throws BusinessException 권한 없음, 팝업스토어 없음, 소유권 없음, 입력값 검증 실패, 수정 실패 시 발생
      */
     @Transactional
-    public boolean updatePopupStore(DB2025_POPUP_MANAGEMENT popup, int userId) {
+    public boolean updatePopupStore(PopupManagement popup, int userId) {
         try {
             validateProducerPermission(userId);
-            DB2025_POPUP_MANAGEMENT existingPopup = findExistingPopup(popup.getId());
+            Map<String, Object> existingPopup = findExistingPopup(popup.getPopupId());
             validatePopupOwnership(existingPopup, userId);
             validatePopupInput(popup);
 
@@ -122,18 +123,48 @@ public class PopupStoreService {
     }
 
     /**
+     * 팝업스토어 정보 삭제
+     * 
+     * 처리 과정:
+     * 1. 생산자 권한 확인
+     * 2. 기존 팝업스토어 존재 확인
+     * 3. 소유권 확인
+     * 4. 팝업스토어 삭제
+     * 
+     * @param popupId 삭제할 팝업스토어 ID
+     * @param userId 삭제를 시도하는 사용자 ID
+     * @return 삭제 성공 여부
+     * @throws BusinessException 권한 없음, 팝업스토어 없음, 소유권 없음, 삭제 실패 시 발생
+     */
+    @Transactional
+    public boolean deletePopupStore(int popupId, int userId) {
+        try {
+            validateProducerPermission(userId);
+            Map<String, Object> existingPopup = findExistingPopup(popupId);
+            validatePopupOwnership(existingPopup, userId);
+
+            if (!popupRepository.deletePopup(popupId)) {
+                throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "팝업스토어 삭제에 실패했습니다.");
+            }
+
+            return true;
+        } catch (BusinessException e) {
+            throw e;
+        } catch (SQLException e) {
+            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    /**
      * 팝업스토어 조회
      * 
      * @param id 조회할 팝업스토어 ID
      * @return 팝업스토어 정보 (Optional)
      * @throws BusinessException 데이터베이스 오류 발생 시
      */
-    public Optional<DB2025_POPUP_MANAGEMENT> findPopupById(int id) {
-        try {
-            return popupRepository.findById(id);
-        } catch (SQLException e) {
-            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다: " + e.getMessage());
-        }
+    public Optional<Map<String, Object>> findPopupById(int id) throws SQLException {
+        return popupRepository.findPopupById(id);
+
     }
 
     // Private helper methods
@@ -145,7 +176,7 @@ public class PopupStoreService {
      * @throws BusinessException 사용자가 없거나 생산자가 아닌 경우
      */
     private void validateProducerPermission(int userId) throws SQLException {
-        Optional<DB2025_USER> userOpt = userRepository.findById(userId);
+        Optional<User> userOpt = userRepository.findByUserId(userId);
         if (userOpt.isEmpty()) {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND);
         }
@@ -166,7 +197,7 @@ public class PopupStoreService {
      * @param popup 검증할 팝업스토어 정보
      * @throws BusinessException 검증 실패 시
      */
-    private void validatePopupInput(DB2025_POPUP_MANAGEMENT popup) {
+    private void validatePopupInput(PopupManagement popup) {
         if (popup == null) {
             throw new BusinessException(ErrorCode.INVALID_INPUT, "팝업스토어 정보가 없습니다.");
         }
@@ -195,8 +226,8 @@ public class PopupStoreService {
      * @return 존재하는 팝업스토어 정보
      * @throws BusinessException 팝업스토어가 존재하지 않는 경우
      */
-    private DB2025_POPUP_MANAGEMENT findExistingPopup(int popupId) throws SQLException {
-        return popupRepository.findById(popupId)
+    private Map<String, Object> findExistingPopup(int popupId) throws SQLException {
+        return popupRepository.findPopupById(popupId)
             .orElseThrow(() -> new BusinessException(ErrorCode.POPUP_NOT_FOUND));
     }
 
@@ -207,8 +238,8 @@ public class PopupStoreService {
      * @param userId 확인할 사용자 ID
      * @throws BusinessException 소유권이 없는 경우
      */
-    private void validatePopupOwnership(DB2025_POPUP_MANAGEMENT popup, int userId) {
-        if (popup.getUserId() != userId) {
+    private void validatePopupOwnership(Map<String, Object> popup, int userId) {
+        if ((Integer)popup.get("userId") != userId) {
             throw new BusinessException(ErrorCode.INVALID_ROLE, "다른 사용자의 팝업스토어는 수정할 수 없습니다.");
         }
     }

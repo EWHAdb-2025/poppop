@@ -9,6 +9,7 @@ public enum ErrorCode {
     // 공통 예외
     INVALID_INPUT("잘못된 입력값입니다."),
     INTERNAL_SERVER_ERROR("서버 내부 오류가 발생했습니다."),
+    RECORD_NOT_FOUND("처리 기록을 찾을 수 없습니다."),
     
     // 사용자 관련 예외
     DUPLICATE_EMAIL("이미 등록된 이메일입니다."),
