@@ -1,32 +1,31 @@
-package poppop.src.DB2025Team05_poppop.DB2025Team05_repository;
+package db2025.DB2025Team05_poppop.DB2025Team05_repository;
 
-import poppop.src.DB2025Team05_poppop.DB2025Team05_repository.DBConnection;
-import poppop.src.DB2025Team05_poppop.DB2025Team05_domain.DB2025_POPUP_MANAGEMENT;
-
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_POPUP_MANAGEMENT;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_USER;
 import java.sql.*;
 import java.util.*;
 
 public class PopupRepository {
     private final Connection conn;
 
-    public PopupRepository() throws SQLException{
-        this.conn = DBConnection.getConnection();
+    public PopupRepository(Connection conn) throws SQLException {
+        this.conn = conn;
     }
 
     // insert
-    public boolean insertPopup(DB2025_POPUP_MANAGEMENT popup){
-        String sql = "insert into DB2025_POPUP_MANAGEMENT(popup_id, user_id, popup_start_date, popup_end_date, popup_address, popup_name) values (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)){
+    public boolean insertPopup(DB2025_POPUP_MANAGEMENT popup) {
+        String sql = "insert INTO DB2025_POPUP_MANAGEMENT(popup_id, user_id, address, " +
+                    "start_date, end_date) values (?, ?, ?, ?, ?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, popup.getPopupId());
-            pstmt.setInt(2, popup.getUserId().getId());
-            pstmt.setDate(3, java.sql.Date.valueOf(popup.getStartDate()));
-            pstmt.setDate(4, java.sql.Date.valueOf(popup.getEndDate()));
-            pstmt.setString(5, popup.getAddress());
-            pstmt.setString(6, popup.getName());
+            pstmt.setInt(2, popup.getUserId());
+            pstmt.setString(3, popup.getAddress());
+            pstmt.setDate(4, Date.valueOf(popup.getStartDate()));
+            pstmt.setDate(5, Date.valueOf(popup.getEndDate()));
             pstmt.executeUpdate();
             return true;
-        } catch(SQLException e){
-            System.out.println("팝업 삽입 오류: "+e.getMessage());
+        } catch (SQLException e) {
+            System.out.println("팝업스토어 등록 중 오류 발생: " + e.getMessage());
             return false;
         }
     }
@@ -121,47 +120,63 @@ public class PopupRepository {
     }
 
     // update (동적 쿼리 구현)
-    public boolean updatePopup(DB2025_POPUP_MANAGEMENT popup){
-        StringBuilder sql = new StringBuilder("update DB2025_POPUP_MANAGEMENT set ");
-        List<Object> params = new ArrayList<>();
-
-        if (popup.getAddress() != null && !popup.getAddress().isBlank()) {
-            sql.append("popup_address = ?, ");
-            params.add(popup.getAddress());
-        }
-        if (popup.getStartDate() != null) {
-            sql.append("popup_start_date = ?, ");
-            params.add(java.sql.Date.valueOf(popup.getStartDate()));
-        }
-        if (popup.getEndDate() != null) {
-            sql.append("popup_end_date = ?, ");
-            params.add(java.sql.Date.valueOf(popup.getEndDate()));
-        }
-        if (popup.getName() != null && !popup.getName().isBlank()) {
-            sql.append("popup_name = ?, ");
-            params.add(popup.getName());
-        }
-        if (params.isEmpty()) {
-            System.out.println("수정할 필드가 없습니다.");
-            return false;
-        }
-
-        sql.setLength(sql.length() - 2);
-        sql.append(" WHERE popup_id = ?");
-        params.add(popup.getPopupId());
-
-        try (PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
-            for (int i = 0; i < params.size(); i++) {
-                pstmt.setObject(i + 1, params.get(i));
-            }
-
+    public boolean updatePopup(DB2025_POPUP_MANAGEMENT popup) {
+        String sql = "update DB2025_POPUP_MANAGEMENT set address = ?, start_date = ?, " +
+                    "end_date = ? where popup_id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, popup.getAddress());
+            pstmt.setDate(2, Date.valueOf(popup.getStartDate()));
+            pstmt.setDate(3, Date.valueOf(popup.getEndDate()));
+            pstmt.setInt(4, popup.getPopupId());
             int rowsUpdated = pstmt.executeUpdate();
             return rowsUpdated > 0;
-
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("팝업스토어 수정 중 오류 발생: " + e.getMessage());
             return false;
         }
+    }
+
+    public Optional<DB2025_POPUP_MANAGEMENT> findByPopupId(int popupId) {
+        String sql = "select * from DB2025_POPUP_MANAGEMENT where popup_id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, popupId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                DB2025_POPUP_MANAGEMENT popup = new DB2025_POPUP_MANAGEMENT(
+                    rs.getInt("popup_id"),
+                    rs.getInt("user_id"),
+                    rs.getString("address"),
+                    rs.getDate("start_date").toLocalDate(),
+                    rs.getDate("end_date").toLocalDate()
+                );
+                return Optional.of(popup);
+            }
+        } catch (SQLException e) {
+            System.out.println("팝업스토어 조회 중 오류 발생: " + e.getMessage());
+        }
+        return Optional.empty();
+    }
+
+    public List<DB2025_POPUP_MANAGEMENT> findByUserId(int userId) {
+        List<DB2025_POPUP_MANAGEMENT> popups = new ArrayList<>();
+        String sql = "select * from DB2025_POPUP_MANAGEMENT where user_id = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                DB2025_POPUP_MANAGEMENT popup = new DB2025_POPUP_MANAGEMENT(
+                    rs.getInt("popup_id"),
+                    rs.getInt("user_id"),
+                    rs.getString("address"),
+                    rs.getDate("start_date").toLocalDate(),
+                    rs.getDate("end_date").toLocalDate()
+                );
+                popups.add(popup);
+            }
+        } catch (SQLException e) {
+            System.out.println("팝업스토어 목록 조회 중 오류 발생: " + e.getMessage());
+        }
+        return popups;
     }
 }
 

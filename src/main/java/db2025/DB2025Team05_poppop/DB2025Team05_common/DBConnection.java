@@ -1,4 +1,4 @@
-package poppop.src.DB2025Team05_poppop.DB2025Team05_repository;
+package db2025.DB2025Team05_poppop.DB2025Team05_common;
 
 import java.sql.*;
 
@@ -20,4 +20,4 @@ public class DBConnection {
     public static Connection getConnection() throws SQLException {
         return DriverManager.getConnection(DB_URL, USER, PASSWORD);
     }
-}
+} 

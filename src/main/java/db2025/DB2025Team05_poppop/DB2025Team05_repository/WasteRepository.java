@@ -1,8 +1,6 @@
-package poppop.src.DB2025Team05_poppop.DB2025Team05repository;
+package db2025.DB2025Team05_poppop.DB2025Team05_repository;
 
-import poppop.src.DB2025Team05_poppop.DB2025Team05_repository.DBConnection;
-import poppop.src.DB2025Team05_poppop.DB2025Team05_domain.DB2025_WASTE;
-
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_WASTE;
 import java.sql.*;
 import java.util.*;
 
