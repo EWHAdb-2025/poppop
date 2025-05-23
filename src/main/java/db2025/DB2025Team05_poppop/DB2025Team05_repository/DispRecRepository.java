@@ -1,9 +1,9 @@
 package db2025.DB2025Team05_poppop.DB2025Team05_repository;
 
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_DISPOSAL_RECORD;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_USER;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_POPUP_MANAGEMENT;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_WASTE;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.DisposalRecord;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.User;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.PopupManagement;  
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.Waste;
 import db2025.DB2025Team05_poppop.DB2025Team05_common.DBConnection;
 import java.sql.*;
 import java.util.*;
@@ -22,7 +22,7 @@ public class DispRecRepository {
     }
 
     // insert
-    public boolean insertDisRec(DB2025_DISPOSAL_RECORD dr) {
+    public boolean insertDisRec(DisposalRecord dr) {
         String sql = "insert INTO DB2025_DISPOSAL_RECORD(disposal_id, user_id, popup_id, waste_id, status, disposal_date) values (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, dr.getDisposalId());
@@ -107,7 +107,7 @@ public class DispRecRepository {
     }
 
     // update (dynamic query)
-    public boolean updateDisposalRecord(DB2025_DISPOSAL_RECORD dr) {
+    public boolean updateDisposalRecord(DisposalRecord dr) {
         StringBuilder sql = new StringBuilder("UPDATE DB2025_DISPOSAL_RECORD SET ");
         List<Object> params = new ArrayList<>();
     
@@ -154,7 +154,7 @@ public class DispRecRepository {
         }
     }
 
-    public boolean insertDisposalRecord(DB2025_DISPOSAL_RECORD record) {
+    public boolean insertDisposalRecord(DisposalRecord record) {
         String sql = "insert INTO DB2025_DISPOSAL_RECORD(disposal_id, user_id, popup_id, status) " +
                     "values (?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {

@@ -2,8 +2,8 @@ package db2025.DB2025Team05_poppop.DB2025Team05_service;
 
 import db2025.DB2025Team05_poppop.DB2025Team05_common.ErrorCode;
 import db2025.DB2025Team05_poppop.DB2025Team05_common.Role;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_COMPANY_INFO;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_USER;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.CompanyInfo;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.User;
 import db2025.DB2025Team05_poppop.DB2025Team05_exception.BusinessException;
 import db2025.DB2025Team05_poppop.DB2025Team05_repository.CompanyRepository;
 import db2025.DB2025Team05_poppop.DB2025Team05_repository.UserRepository;
@@ -77,12 +77,12 @@ public class UserService {
      * @throws BusinessException 입력값 검증 실패, 이메일 중복, 저장 실패 시 발생
      */
     @Transactional
-    public DB2025_USER registerUser(DB2025_USER user, DB2025_COMPANY_INFO companyInfo) {
+    public User registerUser(User user, CompanyInfo companyInfo) {
         try {
             validateRegistrationInput(user, companyInfo);
             checkEmailDuplicate(user.getEmail());
             
-            DB2025_USER savedUser = saveUser(user);
+            User savedUser = saveUser(user);
             if (user.getRole() == Role.PRODUCER) {
                 saveCompanyInfo(savedUser.getId(), companyInfo);
             }
@@ -110,7 +110,7 @@ public class UserService {
      * @throws BusinessException 권한 없음, 입력값 검증 실패, 중복 확인 실패, 저장 실패 시 발생
      */
     @Transactional
-    public DB2025_USER registerProcessor(int managerId, DB2025_USER user, DB2025_COMPANY_INFO companyInfo) {
+    public User registerProcessor(int managerId, User user, CompanyInfo companyInfo) {
         try {
             validateManagerPermission(managerId);
             validateRegistrationInput(user, companyInfo);
@@ -118,7 +118,7 @@ public class UserService {
             checkBusinessNumberDuplicate(companyInfo.getBusinessNumber());
             
             user.setRole(Role.PROCESSOR);
-            DB2025_USER savedUser = saveUser(user);
+            User savedUser = saveUser(user);
             saveCompanyInfo(savedUser.getId(), companyInfo);
             
             return savedUser;
@@ -141,10 +141,10 @@ public class UserService {
      * @throws BusinessException 입력값 검증 실패, 사용자 없음, 이메일 중복, 수정 실패 시 발생
      */
     @Transactional
-    public DB2025_USER updateUser(DB2025_USER user) {
+    public User updateUser(User user) {
         try {
             validateUserInput(user);
-            DB2025_USER existingUser = findExistingUser(user.getId());
+            User existingUser = findExistingUser(user.getId());
             validateEmailChange(existingUser, user);
             
             if (!userRepository.updateUser(user)) {
@@ -162,8 +162,7 @@ public class UserService {
      * 
      * 처리 과정:
      * 1. 기존 사용자 존재 확인
-     * 2. 생산자인 경우 회사 정보 삭제
-     * 3. 사용자 정보 삭제
+     * 2. 사용자 정보 삭제
      * 
      * @param userId 삭제할 사용자 ID
      * @return 삭제 성공 여부
@@ -172,10 +171,7 @@ public class UserService {
     @Transactional
     public boolean deleteUser(int userId) {
         try {
-            DB2025_USER user = findExistingUser(userId);
-            if (user.getRole() == Role.PRODUCER) {
-                companyRepository.deleteCompany(userId);
-            }
+            User user = findExistingUser(userId);
             
             if (!userRepository.deleteUser(userId)) {
                 throw new BusinessException(ErrorCode.USER_DELETE_FAILED);
@@ -194,12 +190,8 @@ public class UserService {
      * @return 사용자 정보 (Optional)
      * @throws BusinessException 데이터베이스 오류 발생 시
      */
-    public Optional<DB2025_USER> findUserById(int userId) {
-        try {
-            return userRepository.findById(userId);
-        } catch (SQLException e) {
-            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다: " + e.getMessage());
-        }
+    public Optional<User> findUserById(int userId) {
+        return userRepository.findByUserId(userId);
     }
 
     // Private helper methods
@@ -211,7 +203,7 @@ public class UserService {
      * @param companyInfo 검증할 회사 정보
      * @throws BusinessException 검증 실패 시
      */
-    private void validateRegistrationInput(DB2025_USER user, DB2025_COMPANY_INFO companyInfo) {
+    private void validateRegistrationInput(User user, CompanyInfo companyInfo) {
         validateUserInput(user);
         if (user.getRole() == Role.PRODUCER) {
             validateCompanyInput(companyInfo);
@@ -230,7 +222,7 @@ public class UserService {
      * @param user 검증할 사용자 정보
      * @throws BusinessException 검증 실패 시
      */
-    private void validateUserInput(DB2025_USER user) {
+    private void validateUserInput(User user) {
         if (user == null) {
             throw new BusinessException(ErrorCode.INVALID_INPUT, "사용자 정보가 없습니다.");
         }
@@ -257,7 +249,7 @@ public class UserService {
      * @param companyInfo 검증할 회사 정보
      * @throws BusinessException 검증 실패 시
      */
-    private void validateCompanyInput(DB2025_COMPANY_INFO companyInfo) {
+    private void validateCompanyInput(CompanyInfo companyInfo) {
         if (companyInfo == null) {
             throw new BusinessException(ErrorCode.INVALID_INPUT, "회사 정보가 없습니다.");
         }
@@ -279,7 +271,7 @@ public class UserService {
      * @throws BusinessException 관리자가 아니거나 존재하지 않는 경우
      */
     private void validateManagerPermission(int managerId) throws SQLException {
-        Optional<DB2025_USER> managerOpt = userRepository.findById(managerId);
+        Optional<User> managerOpt = userRepository.findByUserId(managerId);
         if (managerOpt.isEmpty() || managerOpt.get().getRole() != Role.MANAGER) {
             throw new BusinessException(ErrorCode.INVALID_ROLE, "관리자만 폐기물 처리 업체를 등록할 수 있습니다.");
         }
@@ -316,8 +308,8 @@ public class UserService {
      * @return 존재하는 사용자 정보
      * @throws BusinessException 사용자가 존재하지 않는 경우
      */
-    private DB2025_USER findExistingUser(int userId) throws SQLException {
-        return userRepository.findById(userId)
+    private User findExistingUser(int userId) throws SQLException {
+        return userRepository.findByUserId(userId)
             .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
     }
 
@@ -328,7 +320,7 @@ public class UserService {
      * @param newUser 새로운 사용자 정보
      * @throws BusinessException 이메일이 중복되는 경우
      */
-    private void validateEmailChange(DB2025_USER existingUser, DB2025_USER newUser) throws SQLException {
+    private void validateEmailChange(User existingUser, User newUser) throws SQLException {
         if (!existingUser.getEmail().equals(newUser.getEmail())) {
             checkEmailDuplicate(newUser.getEmail());
         }
@@ -341,8 +333,8 @@ public class UserService {
      * @return 저장된 사용자 정보
      * @throws BusinessException 저장 실패 시
      */
-    private DB2025_USER saveUser(DB2025_USER user) throws SQLException {
-        DB2025_USER savedUser = userRepository.insertUser(user);
+    private User saveUser(User user) throws SQLException {
+        User savedUser = userRepository.insertUser(user);
         if (savedUser == null) {
             throw new BusinessException(ErrorCode.USER_REGISTRATION_FAILED);
         }
@@ -356,7 +348,7 @@ public class UserService {
      * @param companyInfo 저장할 회사 정보
      * @throws BusinessException 저장 실패 시
      */
-    private void saveCompanyInfo(int userId, DB2025_COMPANY_INFO companyInfo) throws SQLException {
+    private void saveCompanyInfo(int userId, CompanyInfo companyInfo) throws SQLException {
         companyInfo.setUserId(userId);
         if (companyRepository.insertCompanyInfo(companyInfo) == null) {
             throw new BusinessException(ErrorCode.COMPANY_REGISTRATION_FAILED);

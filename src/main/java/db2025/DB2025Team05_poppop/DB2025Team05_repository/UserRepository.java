@@ -1,6 +1,6 @@
 package db2025.DB2025Team05_poppop.DB2025Team05_repository;
 
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_USER;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.User;
 import db2025.DB2025Team05_poppop.DB2025Team05_common.DBConnection;
 import db2025.DB2025Team05_poppop.DB2025Team05_common.Role;
 import java.sql.*;
@@ -29,7 +29,7 @@ public class UserRepository {
     }
 
     // insert
-    public DB2025_USER insertUser(DB2025_USER user) throws SQLException {
+    public User insertUser(User user) throws SQLException {
         String sql = "INSERT INTO DB2025_USER (name, email, role) VALUES (?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, user.getName());
@@ -53,13 +53,13 @@ public class UserRepository {
     }
 
     // search by user id
-    public Optional<DB2025_USER> findByUserId(int userId) {
+    public Optional<User> findByUserId(int userId) {
         String sql = "select * from DB2025_USER where user_id=?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                DB2025_USER user = new DB2025_USER();
+                User user = new User();
                 user.setId(rs.getInt("user_id"));
                 user.setName(rs.getString("name"));
                 user.setEmail(rs.getString("email"));
@@ -86,7 +86,7 @@ public class UserRepository {
     }
 
     // update
-    public boolean updateUser(DB2025_USER user) {
+    public boolean updateUser(User user) {
         StringBuilder sql = new StringBuilder("update DB2025_USER set ");
         List<Object> params = new ArrayList<>();
 
@@ -123,20 +123,8 @@ public class UserRepository {
         }
     }
 
-    public Optional<DB2025_USER> findById(int id) throws SQLException {
-        String sql = "SELECT * FROM DB2025_USER WHERE id = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapResultSetToUser(rs));
-                }
-            }
-        }
-        return Optional.empty();
-    }
 
-    public Optional<DB2025_USER> findByEmail(String email) throws SQLException {
+    public Optional<User> findByEmail(String email) throws SQLException {
         String sql = "SELECT * FROM DB2025_USER WHERE email = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);
@@ -149,8 +137,8 @@ public class UserRepository {
         return Optional.empty();
     }
 
-    private DB2025_USER mapResultSetToUser(ResultSet rs) throws SQLException {
-        DB2025_USER user = new DB2025_USER();
+    private User mapResultSetToUser(ResultSet rs) throws SQLException {
+        User user = new User();
         user.setId(rs.getInt("user_id"));
         user.setName(rs.getString("name"));
         user.setEmail(rs.getString("email"));

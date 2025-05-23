@@ -1,6 +1,6 @@
 package db2025.DB2025Team05_poppop.DB2025Team05_repository;
 
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_COMPANY_INFO;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.CompanyInfo;
 import db2025.DB2025Team05_poppop.DB2025Team05_common.DBConnection;
 
 import java.sql.*;
@@ -18,7 +18,7 @@ public class CompanyRepository {
 
     public boolean insertCompanyInfo(int userId, String companyName, String businessNumber, 
                                    String representativeName, String representativePhone) {
-        String sql = "insert INTO DB2025_COMPANY_INFO(user_id, company_name, business_number, " +
+        String sql = "insert INTO CompanyInfo(user_id, company_name, business_number, " +
                     "representative_name, representative_phone) values (?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
@@ -35,7 +35,7 @@ public class CompanyRepository {
     }
 
     public boolean isBusinessNumberDuplicate(String businessNumber) {
-        String sql = "select count(*) from DB2025_COMPANY_INFO where business_number = ?";
+        String sql = "select count(*) from CompanyInfo where business_number = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, businessNumber);
             ResultSet rs = pstmt.executeQuery();
@@ -47,7 +47,7 @@ public class CompanyRepository {
     }
 
     public Optional<Map<String, Object>> findCompanyByUserId(int userId) {
-        String sql = "select * from DB2025_COMPANY_INFO where user_id = ?";
+        String sql = "select * from CompanyInfo where user_id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             ResultSet rs = pstmt.executeQuery();
@@ -68,7 +68,7 @@ public class CompanyRepository {
 
     public boolean updateCompanyInfo(int userId, String companyName, String businessNumber,
                                    String representativeName, String representativePhone) {
-        String sql = "update DB2025_COMPANY_INFO set company_name = ?, business_number = ?, " +
+        String sql = "update CompanyInfo set company_name = ?, business_number = ?, " +
                     "representative_name = ?, representative_phone = ? where user_id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, companyName);
@@ -90,8 +90,8 @@ public class CompanyRepository {
      * @return 저장된 회사 정보 (실패 시 null)
      * @throws SQLException 데이터베이스 오류 발생 시
      */
-    public DB2025_COMPANY_INFO insertCompanyInfo(DB2025_COMPANY_INFO companyInfo) throws SQLException {
-        String sql = "INSERT INTO DB2025_COMPANY_INFO (user_id, company_name, business_number, representative_name, representative_phone, address) VALUES (?, ?, ?, ?, ?, ?)";
+    public CompanyInfo insertCompanyInfo(CompanyInfo companyInfo) throws SQLException {
+        String sql = "INSERT INTO CompanyInfo (user_id, company_name, business_number, representative_name, representative_phone, address) VALUES (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, companyInfo.getUserId());
             pstmt.setString(2, companyInfo.getCompanyName());
@@ -105,8 +105,8 @@ public class CompanyRepository {
         }
     }
 
-    public DB2025_COMPANY_INFO findByUserId(int userId) throws SQLException {
-        String sql = "SELECT * FROM DB2025_COMPANY_INFO WHERE user_id = ?";
+    public CompanyInfo findByUserId(int userId) throws SQLException {
+        String sql = "SELECT * FROM CompanyInfo WHERE user_id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -118,8 +118,8 @@ public class CompanyRepository {
         return null;
     }
 
-    public boolean updateCompany(DB2025_COMPANY_INFO company) throws SQLException {
-        String sql = "UPDATE DB2025_COMPANY_INFO SET company_name = ?, business_number = ?, representative_name = ?, representative_phone = ?, address = ? WHERE user_id = ?";
+    public boolean updateCompany(CompanyInfo company) throws SQLException {
+        String sql = "UPDATE CompanyInfo SET company_name = ?, business_number = ?, representative_name = ?, representative_phone = ?, address = ? WHERE user_id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, company.getCompanyName());
             pstmt.setString(2, company.getBusinessNumber());
@@ -133,15 +133,15 @@ public class CompanyRepository {
     }
 
     public boolean deleteCompany(int userId) throws SQLException {
-        String sql = "DELETE FROM DB2025_COMPANY_INFO WHERE user_id = ?";
+        String sql = "DELETE FROM CompanyInfo WHERE user_id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             return pstmt.executeUpdate() > 0;
         }
     }
 
-    private DB2025_COMPANY_INFO mapResultSetToCompany(ResultSet rs) throws SQLException {
-        DB2025_COMPANY_INFO company = new DB2025_COMPANY_INFO();
+    private CompanyInfo mapResultSetToCompany(ResultSet rs) throws SQLException {
+        CompanyInfo company = new CompanyInfo();
         company.setId(rs.getInt("id"));
         company.setUserId(rs.getInt("user_id"));
         company.setCompanyName(rs.getString("company_name"));

@@ -2,9 +2,9 @@ package db2025.DB2025Team05_poppop.DB2025Team05_service;
 
 import db2025.DB2025Team05_poppop.DB2025Team05_common.ErrorCode;
 import db2025.DB2025Team05_poppop.DB2025Team05_common.Role;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_DISPOSAL_RECORD;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_POPUP_MANAGEMENT;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_USER;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.DisposalRecord;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.PopupManagement;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.User;
 import db2025.DB2025Team05_poppop.DB2025Team05_exception.BusinessException;
 import db2025.DB2025Team05_poppop.DB2025Team05_repository.DispRecRepository;
 import db2025.DB2025Team05_poppop.DB2025Team05_repository.PopupRepository;
@@ -78,7 +78,7 @@ public class DisposalService {
      * @throws BusinessException 권한 없음, 입력값 검증 실패, 저장 실패 시 발생
      */
     @Transactional
-    public DB2025_DISPOSAL_RECORD registerDisposalRecord(DB2025_DISPOSAL_RECORD record, int managerId) {
+    public DisposalRecord registerDisposalRecord(DisposalRecord record, int managerId) {
         try {
             validateManagerPermission(managerId);
             validateProcessorExists(record.getUserId());
@@ -96,6 +96,83 @@ public class DisposalService {
         }
     }
 
+    /**
+     * 폐기물 처리 기록 수정
+     * 
+     * 처리 과정:
+     * 1. 매니저 권한 확인
+     * 2. 처리업체 존재 확인
+     * 3. 팝업스토어 존재 확인
+     * 4. 입력값 유효성 검증
+     * 5. 처리 기록 수정
+     * 
+     * @param record 수정할 처리 기록
+     * @param managerId 수정을 시도하는 매니저 ID
+     * @return 수정된 처리 기록
+     * @throws BusinessException 권한 없음, 입력값 검증 실패, 수정 실패 시 발생
+     */
+    @Transactional
+    public DisposalRecord updateDisposalRecord(DisposalRecord record, int managerId) {
+        try {
+            validateManagerPermission(managerId);
+            validateProcessorExists(record.getUserId());
+            validatePopupExists(record.getPopupId());
+            validateDisposalInput(record);
+
+            boolean success = dispRecRepository.updateDisposalRecord(record);
+            if (!success) {
+                throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "폐기물 처리 기록 수정에 실패했습니다.");
+            }
+
+            return record;
+        } catch (SQLException e) {
+            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 폐기물 처리 기록 삭제
+     * 
+     * 처리 과정:
+     * 1. 매니저 권한 확인
+     * 2. 처리 기록 존재 확인
+     * 3. 처리 기록 삭제
+     * 
+     * @param disposalId 삭제할 처리 기록 ID
+     * @param managerId 삭제를 시도하는 매니저 ID
+     * @return 삭제된 처리 기록
+     * @throws BusinessException 권한 없음, 기록 없음, 삭제 실패 시 발생
+     */
+    @Transactional
+    public DisposalRecord deleteDisposalRecord(int disposalId, int managerId) {
+        try {
+            validateManagerPermission(managerId);
+            
+            Optional<Map<String, Object>> recordOpt = dispRecRepository.findDisRecByDisRecId(disposalId);
+            if (recordOpt.isEmpty()) {
+                throw new BusinessException(ErrorCode.RECORD_NOT_FOUND, "존재하지 않는 처리 기록입니다.");
+            }
+
+            boolean success = dispRecRepository.deleteDisRec(disposalId);
+            if (!success) {
+                throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "폐기물 처리 기록 삭제에 실패했습니다.");
+            }
+
+            Map<String, Object> recordData = recordOpt.get();
+            DisposalRecord deletedRecord = DisposalRecord.builder()
+                .disposalId((Integer) recordData.get("disposalId"))
+                .userId((Integer) recordData.get("userId"))
+                .popupId((Integer) recordData.get("popupId"))
+                .status((String) recordData.get("status"))
+                .disposalDate((java.time.LocalDateTime) recordData.get("disposalDate"))
+                .build();
+
+            return deletedRecord;
+        } catch (SQLException e) {
+            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+    
     /**
      * 회사별 폐기물 처리 통계 조회
      * 
@@ -153,7 +230,7 @@ public class DisposalService {
      * @throws BusinessException 사용자가 없거나 매니저가 아닌 경우
      */
     private void validateManagerPermission(int managerId) throws SQLException {
-        Optional<DB2025_USER> userOpt = userRepository.findById(managerId);
+        Optional<User> userOpt = userRepository.findByUserId(managerId);
         if (userOpt.isEmpty()) {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND);
         }
@@ -169,7 +246,7 @@ public class DisposalService {
      * @throws BusinessException 처리업체가 존재하지 않는 경우
      */
     private void validateProcessorExists(int processorId) throws SQLException {
-        Optional<DB2025_USER> userOpt = userRepository.findById(processorId);
+        Optional<User> userOpt = userRepository.findByUserId(processorId);
         if (userOpt.isEmpty()) {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND, "존재하지 않는 처리업체입니다.");
         }
@@ -182,7 +259,7 @@ public class DisposalService {
      * @throws BusinessException 팝업스토어가 존재하지 않는 경우
      */
     private void validatePopupExists(int popupId) throws SQLException {
-        Optional<DB2025_POPUP_MANAGEMENT> popupOpt = popupRepository.findById(popupId);
+        Optional<Map<String, Object>>  popupOpt = popupRepository.findPopupById(popupId);
         if (popupOpt.isEmpty()) {
             throw new BusinessException(ErrorCode.POPUP_NOT_FOUND);
         }
@@ -199,7 +276,7 @@ public class DisposalService {
      * @param record 검증할 처리 기록
      * @throws BusinessException 검증 실패 시
      */
-    private void validateDisposalInput(DB2025_DISPOSAL_RECORD record) {
+    private void validateDisposalInput(DisposalRecord record) {
         if (record == null) {
             throw new BusinessException(ErrorCode.INVALID_INPUT, "처리 기록 정보가 없습니다.");
         }

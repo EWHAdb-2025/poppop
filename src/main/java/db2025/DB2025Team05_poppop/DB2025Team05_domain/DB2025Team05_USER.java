@@ -7,13 +7,13 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DB2025_USER {
+public class DB2025Team05_USER {
     private int id;
     private String name;
     private Role role;
     private String email;
 
-    public DB2025_USER(int id, String name, String role, String email) {
+    public DB2025Team05_USER(int id, String name, String role, String email) {
         this.id = id;
         this.name = name;
         this.role = Role.fromString(role);

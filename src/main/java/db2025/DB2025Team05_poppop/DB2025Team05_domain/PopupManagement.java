@@ -1,9 +1,6 @@
 package db2025.DB2025Team05_poppop.DB2025Team05_domain;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -11,16 +8,17 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DB2025_POPUP_MANAGEMENT {
-    private int id;
+@Builder
+public class PopupManagement {
+    private int popupId;
     private int userId;
     private String name;
     private String address;
     private LocalDate startDate;
     private LocalDate endDate;
 
-    public DB2025_POPUP_MANAGEMENT(int id, int userId, String address, LocalDate startDate, LocalDate endDate) {
-        this.id = id;
+    public PopupManagement(int popupId, int userId, String address, LocalDate startDate, LocalDate endDate) {
+        this.popupId = popupId;
         this.userId = userId;
         this.address = address;
         this.startDate = startDate;
