@@ -1,14 +1,18 @@
 package db2025.DB2025Team05_poppop.DB2025Team05_repository;
 
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_USER;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.User;
+import db2025.DB2025Team05_poppop.DB2025Team05_common.DBConnection;
+import db2025.DB2025Team05_poppop.DB2025Team05_common.Role;
 import java.sql.*;
 import java.util.*;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class UserRepository {
     private final Connection conn;
 
-    public UserRepository(Connection conn) throws SQLException {
-        this.conn = conn;
+    public UserRepository() throws SQLException {
+        this.conn = DBConnection.getConnection();
     }
 
     // email 중복 확인
@@ -25,34 +29,41 @@ public class UserRepository {
     }
 
     // insert
-    public boolean insertUser(DB2025_USER user) {
-        String sql = "insert INTO DB2025_USER(user_id, name, role, email) values (?, ?, ?, ?)";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, user.getId());
-            pstmt.setString(2, user.getName());
-            pstmt.setString(3, user.getRole());
-            pstmt.setString(4, user.getEmail());
-            pstmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            System.out.println("사용자 등록 중 오류 발생: " + e.getMessage());
-            return false;
+    public User insertUser(User user) throws SQLException {
+        String sql = "INSERT INTO DB2025_USER (name, email, role) VALUES (?, ?, ?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setString(1, user.getName());
+            pstmt.setString(2, user.getEmail());
+            pstmt.setString(3, user.getRole().toString());
+            
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                return null;
+            }
+
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    user.setId(generatedKeys.getInt(1));
+                    return user;
+                } else {
+                    return null;
+                }
+            }
         }
     }
 
     // search by user id
-    public Optional<DB2025_USER> findByUserId(int userId) {
+    public Optional<User> findByUserId(int userId) {
         String sql = "select * from DB2025_USER where user_id=?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                DB2025_USER user = new DB2025_USER(
-                    rs.getInt("user_id"),
-                    rs.getString("name"),
-                    rs.getString("role"),
-                    rs.getString("email")
-                );
+                User user = new User();
+                user.setId(rs.getInt("user_id"));
+                user.setName(rs.getString("name"));
+                user.setEmail(rs.getString("email"));
+                user.setRole(Role.valueOf(rs.getString("role").toUpperCase()));
                 return Optional.of(user);
             }
         } catch (SQLException e) {
@@ -75,7 +86,7 @@ public class UserRepository {
     }
 
     // update
-    public boolean updateUser(DB2025_USER user) {
+    public boolean updateUser(User user) {
         StringBuilder sql = new StringBuilder("update DB2025_USER set ");
         List<Object> params = new ArrayList<>();
 
@@ -110,5 +121,28 @@ public class UserRepository {
             System.out.println("사용자 정보 수정 중 오류 발생: " + e.getMessage());
             return false;
         }
+    }
+
+
+    public Optional<User> findByEmail(String email) throws SQLException {
+        String sql = "SELECT * FROM DB2025_USER WHERE email = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, email);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapResultSetToUser(rs));
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    private User mapResultSetToUser(ResultSet rs) throws SQLException {
+        User user = new User();
+        user.setId(rs.getInt("user_id"));
+        user.setName(rs.getString("name"));
+        user.setEmail(rs.getString("email"));
+        user.setRole(Role.fromString(rs.getString("role")));
+        return user;
     }
 }

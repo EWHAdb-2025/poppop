@@ -1,9 +1,12 @@
 package db2025.DB2025Team05_poppop.DB2025Team05_repository;
 
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_WASTE;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.Waste;
+import db2025.DB2025Team05_poppop.DB2025Team05_common.DBConnection;
 import java.sql.*;
 import java.util.*;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class WasteRepository {
     private final Connection conn;
 
@@ -12,8 +15,8 @@ public class WasteRepository {
     }
 
     // insert
-    public boolean insertWaste(DB2025_WASTE waste) {
-        String sql = "insert into DB2025_WASTE(waste_id, waste_amount, waste_type) values (?, ?, ?)";
+    public Integer insertWaste(Waste waste) {
+        String sql = "insert into Waste(waste_id, waste_amount, waste_type) values (?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, waste.getId());
             if (waste.getAmount() != null) {
@@ -23,22 +26,22 @@ public class WasteRepository {
             }
             pstmt.setString(3, waste.getType());
             pstmt.executeUpdate();
-            return true;
+            return waste.getId();
         } catch (SQLException e) {
             System.out.println("폐기물 삽입 오류: " + e.getMessage());
             e.printStackTrace();
-            return false;
+            return 0;
         }
     }
 
     // search
-    public Optional<DB2025_WASTE> findByWasteId(int id) {
-        String sql = "select * from DB2025_WASTE where waste_id = ?";
+    public Optional<Waste> findByWasteId(int id) {
+        String sql = "select * from Waste where waste_id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
-                DB2025_WASTE waste = DB2025_WASTE.builder()
+                Waste waste = Waste.builder()
                     .id(rs.getInt("waste_id"))
                     .amount(rs.getInt("waste_amount"))
                     .type(rs.getString("waste_type"))
@@ -56,7 +59,7 @@ public class WasteRepository {
     public Optional<Map<String, Integer>> getTotalWasteAmountByType() {
         String sql = """
             SELECT waste_type, SUM(waste_amount) AS total_amount
-            FROM DB2025_WASTE
+            FROM Waste
             GROUP BY waste_type
         """;
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -74,7 +77,7 @@ public class WasteRepository {
 
     // delete
     public boolean deleteWaste(int id) {
-        String sql = "delete from DB2025_WASTE where waste_id = ?";
+        String sql = "delete from Waste where waste_id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             int rowsDeleted = pstmt.executeUpdate();
@@ -87,8 +90,8 @@ public class WasteRepository {
     }
 
     // update(dynamic query)
-    public boolean updateWaste(DB2025_WASTE waste) {
-        StringBuilder sql = new StringBuilder("update DB2025_WASTE set ");
+    public boolean updateWaste(Waste waste) {
+        StringBuilder sql = new StringBuilder("update Waste set ");
         List<Object> params = new ArrayList<>();
 
         if (waste.getAmount() != null) {
