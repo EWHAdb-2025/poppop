@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DB2025_POPUP_MANAGEMENT {
+public class DB2025Team05_POPUP_MANAGEMENT {
     private int id;
     private int userId;
     private String name;
@@ -19,7 +19,7 @@ public class DB2025_POPUP_MANAGEMENT {
     private LocalDate startDate;
     private LocalDate endDate;
 
-    public DB2025_POPUP_MANAGEMENT(int id, int userId, String address, LocalDate startDate, LocalDate endDate) {
+    public DB2025Team05_POPUP_MANAGEMENT(int id, int userId, String address, LocalDate startDate, LocalDate endDate) {
         this.id = id;
         this.userId = userId;
         this.address = address;
