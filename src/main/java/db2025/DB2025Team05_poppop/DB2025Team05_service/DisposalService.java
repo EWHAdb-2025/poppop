@@ -243,6 +243,23 @@ public class DisposalService {
         }
     }
 
+
+    /**
+     * 회사별 폐기물 처리 통계 조회
+     *
+     * @param managerId 조회를 시도하는 매니저 ID
+     * @return 월별 처리 통계 목록
+     * @throws BusinessException 권한 없음, 조회 실패 시 발생
+     */
+    public Optional<List<Map<String, Object>>> getDisposalStatisticsByCompanyname(int managerId, String companyname) {
+        try {
+            validateManagerPermission(managerId);
+            return dispRecRepository. getDisposalStatisticsByCompanyname(companyname);
+        } catch (SQLException e) {
+            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다: " + e.getMessage());
+        }
+    }
+
     // Private helper methods
 
     /**

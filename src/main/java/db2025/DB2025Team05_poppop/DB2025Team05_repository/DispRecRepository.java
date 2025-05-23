@@ -161,4 +161,9 @@ public class DispRecRepository {
         return Optional.empty();
     }
 
+    //TODO: 회사별 폐기물 처리 통계 조회(waste, disposal record 다 보이게)
+    public Optional<List<Map<String, Object>>> getDisposalStatisticsByCompanyname(String companyname) {
+        return Optional.empty();
+    }
+
 }
