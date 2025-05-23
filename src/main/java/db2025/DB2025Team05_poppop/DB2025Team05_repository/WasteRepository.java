@@ -1,9 +1,12 @@
 package db2025.DB2025Team05_poppop.DB2025Team05_repository;
 
 import db2025.DB2025Team05_poppop.DB2025Team05_domain.DB2025_WASTE;
+import db2025.DB2025Team05_poppop.DB2025Team05_common.DBConnection;
 import java.sql.*;
 import java.util.*;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public class WasteRepository {
     private final Connection conn;
 

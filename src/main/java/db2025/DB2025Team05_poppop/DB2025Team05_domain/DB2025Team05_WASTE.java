@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class DB2025_WASTE {
+public class DB2025Team05_WASTE {
     private int id;
     private Integer amount;
     private String type;

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class DB2025_DISPOSAL_RECORD {
+public class DB2025Team05_DISPOSAL_RECORD {
     private int disposalId;
     private int userId;
     private int popupId;
