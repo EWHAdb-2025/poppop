@@ -1,7 +1,9 @@
 package db2025.DB2025Team05_poppop.DB2025Team05_common;
 
 import java.sql.*;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DBConnection {
     //JDBC driver name and database URL
 	private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";  
