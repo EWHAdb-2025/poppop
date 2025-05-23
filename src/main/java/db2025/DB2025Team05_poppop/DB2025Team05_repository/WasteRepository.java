@@ -15,7 +15,7 @@ public class WasteRepository {
     }
 
     // insert
-    public boolean insertWaste(Waste waste) {
+    public Integer insertWaste(Waste waste) {
         String sql = "insert into Waste(waste_id, waste_amount, waste_type) values (?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, waste.getId());
@@ -26,11 +26,11 @@ public class WasteRepository {
             }
             pstmt.setString(3, waste.getType());
             pstmt.executeUpdate();
-            return true;
+            return waste.getId();
         } catch (SQLException e) {
             System.out.println("폐기물 삽입 오류: " + e.getMessage());
             e.printStackTrace();
-            return false;
+            return 0;
         }
     }
 

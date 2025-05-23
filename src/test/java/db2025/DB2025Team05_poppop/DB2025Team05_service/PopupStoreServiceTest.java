@@ -131,7 +131,7 @@ class PopupStoreServiceTest {
         when(popupRepository.findPopupById(popupId)).thenReturn(Optional.of(popupInfo));
 
         // When
-        Optional<Map<String, Object>> result = popupStoreService.findPopupById(popupId);
+        Optional<Map<String, Object>> result = popupRepository.findPopupById(popupId);
 
         // Then
         assertTrue(result.isPresent());

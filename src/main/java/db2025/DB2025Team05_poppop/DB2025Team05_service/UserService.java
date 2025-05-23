@@ -350,7 +350,8 @@ public class UserService {
      */
     private void saveCompanyInfo(int userId, CompanyInfo companyInfo) throws SQLException {
         companyInfo.setUserId(userId);
-        if (companyRepository.insertCompanyInfo(companyInfo) == null) {
+
+        if (!companyRepository.insertCompanyInfo(companyInfo.getUserId(), companyInfo.getCompanyName(), companyInfo.getBusinessNumber(), companyInfo.getRepresentativeName(), companyInfo.getRepresentativePhone())) {
             throw new BusinessException(ErrorCode.COMPANY_REGISTRATION_FAILED);
         }
     }

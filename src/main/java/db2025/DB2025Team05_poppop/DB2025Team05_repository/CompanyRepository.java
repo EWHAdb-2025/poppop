@@ -84,61 +84,6 @@ public class CompanyRepository {
         }
     }
 
-    /**
-     * 회사 정보 저장
-     * @param companyInfo 저장할 회사 정보
-     * @return 저장된 회사 정보 (실패 시 null)
-     * @throws SQLException 데이터베이스 오류 발생 시
-     */
-    public CompanyInfo insertCompanyInfo(CompanyInfo companyInfo) throws SQLException {
-        String sql = "INSERT INTO CompanyInfo (user_id, company_name, business_number, representative_name, representative_phone, address) VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, companyInfo.getUserId());
-            pstmt.setString(2, companyInfo.getCompanyName());
-            pstmt.setString(3, companyInfo.getBusinessNumber());
-            pstmt.setString(4, companyInfo.getRepresentativeName());
-            pstmt.setString(5, companyInfo.getRepresentativePhone());
-            pstmt.setString(6, companyInfo.getAddress());
-            
-            boolean success = pstmt.executeUpdate() > 0;
-            return success ? companyInfo : null;
-        }
-    }
-
-    public CompanyInfo findByUserId(int userId) throws SQLException {
-        String sql = "SELECT * FROM CompanyInfo WHERE user_id = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, userId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return mapResultSetToCompany(rs);
-                }
-            }
-        }
-        return null;
-    }
-
-    public boolean updateCompany(CompanyInfo company) throws SQLException {
-        String sql = "UPDATE CompanyInfo SET company_name = ?, business_number = ?, representative_name = ?, representative_phone = ?, address = ? WHERE user_id = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, company.getCompanyName());
-            pstmt.setString(2, company.getBusinessNumber());
-            pstmt.setString(3, company.getRepresentativeName());
-            pstmt.setString(4, company.getRepresentativePhone());
-            pstmt.setString(5, company.getAddress());
-            pstmt.setInt(6, company.getUserId());
-            
-            return pstmt.executeUpdate() > 0;
-        }
-    }
-
-    public boolean deleteCompany(int userId) throws SQLException {
-        String sql = "DELETE FROM CompanyInfo WHERE user_id = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, userId);
-            return pstmt.executeUpdate() > 0;
-        }
-    }
 
     private CompanyInfo mapResultSetToCompany(ResultSet rs) throws SQLException {
         CompanyInfo company = new CompanyInfo();

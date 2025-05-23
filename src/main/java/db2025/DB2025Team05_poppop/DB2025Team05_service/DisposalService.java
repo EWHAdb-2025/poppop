@@ -5,10 +5,13 @@ import db2025.DB2025Team05_poppop.DB2025Team05_common.Role;
 import db2025.DB2025Team05_poppop.DB2025Team05_domain.DisposalRecord;
 import db2025.DB2025Team05_poppop.DB2025Team05_domain.PopupManagement;
 import db2025.DB2025Team05_poppop.DB2025Team05_domain.User;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.Waste;
 import db2025.DB2025Team05_poppop.DB2025Team05_exception.BusinessException;
 import db2025.DB2025Team05_poppop.DB2025Team05_repository.DispRecRepository;
 import db2025.DB2025Team05_poppop.DB2025Team05_repository.PopupRepository;
 import db2025.DB2025Team05_poppop.DB2025Team05_repository.UserRepository;
+import db2025.DB2025Team05_poppop.DB2025Team05_repository.WasteRepository;
+import org.antlr.v4.runtime.atn.SemanticContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +39,7 @@ public class DisposalService {
     private final DispRecRepository dispRecRepository;
     private final UserRepository userRepository;
     private final PopupRepository popupRepository;
+    private final WasteRepository wasteRepository;
 
     /**
      * 시스템에서 사용되는 상수값들을 관리하는 내부 클래스
@@ -56,37 +60,50 @@ public class DisposalService {
      * @param userRepository 사용자 정보를 관리하는 저장소
      * @param popupRepository 팝업스토어 정보를 관리하는 저장소
      */
-    public DisposalService(DispRecRepository dispRecRepository, UserRepository userRepository, PopupRepository popupRepository) {
+    public DisposalService(DispRecRepository dispRecRepository, UserRepository userRepository, PopupRepository popupRepository, WasteRepository wasteRepository) {
         this.dispRecRepository = dispRecRepository;
         this.userRepository = userRepository;
         this.popupRepository = popupRepository;
+        this.wasteRepository = wasteRepository;
     }
 
     /**
      * 폐기물 처리 기록 등록
-     * 
+     *
      * 처리 과정:
      * 1. 매니저 권한 확인
-     * 2. 처리업체 존재 확인
-     * 3. 팝업스토어 존재 확인
-     * 4. 입력값 유효성 검증
-     * 5. 처리 기록 저장
-     * 
+     * 2. 처리업체 존재 확인 (userId)
+     * 3. 팝업스토어 존재 확인 (popupId)
+     * 4. DisposalRecord 입력값 유효성 검증
+     * 5. 폐기물 정보(Waste) 저장 후 생성된 wasteId 획득
+     * 6. DisposalRecord에 wasteId 설정
+     * 7. DisposalRecord 저장
+     *
      * @param record 등록할 처리 기록
      * @param managerId 등록을 시도하는 매니저 ID
      * @return 등록된 처리 기록
      * @throws BusinessException 권한 없음, 입력값 검증 실패, 저장 실패 시 발생
      */
     @Transactional
-    public DisposalRecord registerDisposalRecord(DisposalRecord record, int managerId) {
+    public DisposalRecord registerDisposalRecord(DisposalRecord record, Waste waste, int managerId) {
         try {
             validateManagerPermission(managerId);
             validateProcessorExists(record.getUserId());
             validatePopupExists(record.getPopupId());
             validateDisposalInput(record);
 
-            boolean success = dispRecRepository.insertDisposalRecord(record);
-            if (!success) {
+            // 1. Waste 먼저 저장하고 생성된 ID를 받아옴
+            Integer generatedWasteId = wasteRepository.insertWaste(waste);
+            if (generatedWasteId == null) {
+                throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "폐기물 정보 등록에 실패했습니다.");
+            }
+
+            // 2. DisposalRecord에 wasteId 설정
+            record.setWasteId(generatedWasteId);
+
+            // 3. DisposalRecord 저장
+            boolean disposalSuccess = dispRecRepository.insertDisposalRecord(record);
+            if (!disposalSuccess) {
                 throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "폐기물 처리 기록 등록에 실패했습니다.");
             }
 
@@ -98,13 +115,14 @@ public class DisposalService {
 
     /**
      * 폐기물 처리 기록 수정
-     * 
+     *
      * 처리 과정:
      * 1. 매니저 권한 확인
      * 2. 처리업체 존재 확인
      * 3. 팝업스토어 존재 확인
-     * 4. 입력값 유효성 검증
-     * 5. 처리 기록 수정
+     * 4. DisposalRecord 입력값 유효성 검증
+     * 5. Waste 테이블에서 폐기물 정보 수정 (wasteId 기준)
+     * 6. DisposalRecord 테이블에서 처리 기록 수정
      * 
      * @param record 수정할 처리 기록
      * @param managerId 수정을 시도하는 매니저 ID
@@ -112,15 +130,22 @@ public class DisposalService {
      * @throws BusinessException 권한 없음, 입력값 검증 실패, 수정 실패 시 발생
      */
     @Transactional
-    public DisposalRecord updateDisposalRecord(DisposalRecord record, int managerId) {
+    public DisposalRecord updateDisposalRecord(DisposalRecord record, Waste waste, int managerId) {
         try {
             validateManagerPermission(managerId);
             validateProcessorExists(record.getUserId());
             validatePopupExists(record.getPopupId());
             validateDisposalInput(record);
 
-            boolean success = dispRecRepository.updateDisposalRecord(record);
-            if (!success) {
+            // 1. 폐기물 정보 수정 먼저
+            boolean wasteUpdated = wasteRepository.updateWaste(waste);
+            if (!wasteUpdated) {
+                throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "폐기물 정보 수정에 실패했습니다.");
+            }
+
+            // 2. 처리 기록 수정
+            boolean recordUpdated = dispRecRepository.updateDisposalRecord(record);
+            if (!recordUpdated) {
                 throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "폐기물 처리 기록 수정에 실패했습니다.");
             }
 
@@ -132,11 +157,14 @@ public class DisposalService {
 
     /**
      * 폐기물 처리 기록 삭제
-     * 
+     *
      * 처리 과정:
      * 1. 매니저 권한 확인
-     * 2. 처리 기록 존재 확인
-     * 3. 처리 기록 삭제
+     * 2. 처리 기록(disposalId) 존재 여부 확인
+     * 3. 관련 wasteId 추출
+     * 4. DisposalRecord 삭제
+     * 5. 해당 wasteId로 Waste 삭제
+     * 6. 삭제된 DisposalRecord 정보 반환
      * 
      * @param disposalId 삭제할 처리 기록 ID
      * @param managerId 삭제를 시도하는 매니저 ID
@@ -147,63 +175,57 @@ public class DisposalService {
     public DisposalRecord deleteDisposalRecord(int disposalId, int managerId) {
         try {
             validateManagerPermission(managerId);
-            
+
             Optional<Map<String, Object>> recordOpt = dispRecRepository.findDisRecByDisRecId(disposalId);
             if (recordOpt.isEmpty()) {
                 throw new BusinessException(ErrorCode.RECORD_NOT_FOUND, "존재하지 않는 처리 기록입니다.");
             }
 
-            boolean success = dispRecRepository.deleteDisRec(disposalId);
-            if (!success) {
+            Map<String, Object> recordData = recordOpt.get();
+            Integer wasteId = (Integer) recordData.get("wasteId");
+
+            // 1. 처리 기록 삭제
+            boolean recordDeleted = dispRecRepository.deleteDisRec(disposalId);
+            if (!recordDeleted) {
                 throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "폐기물 처리 기록 삭제에 실패했습니다.");
             }
 
-            Map<String, Object> recordData = recordOpt.get();
-            DisposalRecord deletedRecord = DisposalRecord.builder()
-                .disposalId((Integer) recordData.get("disposalId"))
-                .userId((Integer) recordData.get("userId"))
-                .popupId((Integer) recordData.get("popupId"))
-                .status((String) recordData.get("status"))
-                .disposalDate((java.time.LocalDateTime) recordData.get("disposalDate"))
-                .build();
+            // 2. 연관된 폐기물 정보 삭제
+            boolean wasteDeleted = wasteRepository.deleteWaste(wasteId);
+            if (!wasteDeleted) {
+                throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "연관된 폐기물 정보 삭제에 실패했습니다.");
+            }
 
-            return deletedRecord;
+            // 3. 반환
+            return DisposalRecord.builder()
+                    .disposalId(disposalId)
+                    .userId((Integer) recordData.get("userId"))
+                    .popupId((Integer) recordData.get("popupId"))
+                    .status((String) recordData.get("status"))
+                    .disposalDate((java.time.LocalDateTime) recordData.get("disposalDate"))
+                    .wasteId(wasteId)
+                    .build();
         } catch (SQLException e) {
             throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다: " + e.getMessage());
         }
     }
     
     /**
-     * 회사별 폐기물 처리 통계 조회
-     * 
+     * 팝업별 폐기물 처리 통계 조회
+     *
      * @param managerId 조회를 시도하는 매니저 ID
      * @return 회사별 처리 통계 목록
      * @throws BusinessException 권한 없음, 조회 실패 시 발생
      */
-    public List<Map<String, Object>> getDisposalStatisticsByCompany(int managerId) {
+    public Optional<List<Map<String, Object>>> getDisposalStatisticsByPopup(int managerId, String popupName) {
         try {
             validateManagerPermission(managerId);
-            return dispRecRepository.getDisposalStatisticsByCompany();
+            return dispRecRepository.getDisposalStatisticsByPopupname(popupName);
         } catch (SQLException e) {
             throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
-    /**
-     * 팝업스토어별 폐기물 처리 통계 조회
-     * 
-     * @param managerId 조회를 시도하는 매니저 ID
-     * @return 팝업스토어별 처리 통계 목록
-     * @throws BusinessException 권한 없음, 조회 실패 시 발생
-     */
-    public List<Map<String, Object>> getDisposalStatisticsByPopup(int managerId) {
-        try {
-            validateManagerPermission(managerId);
-            return dispRecRepository.getDisposalStatisticsByPopup();
-        } catch (SQLException e) {
-            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다: " + e.getMessage());
-        }
-    }
 
     /**
      * 월별 폐기물 처리 통계 조회
@@ -212,10 +234,10 @@ public class DisposalService {
      * @return 월별 처리 통계 목록
      * @throws BusinessException 권한 없음, 조회 실패 시 발생
      */
-    public List<Map<String, Object>> getDisposalStatisticsByMonth(int managerId) {
+    public Optional<List<Map<String, Object>>> getDisposalStatisticsByMonth(int managerId, int year, int month) {
         try {
             validateManagerPermission(managerId);
-            return dispRecRepository.getDisposalStatisticsByMonth();
+            return dispRecRepository.getDisposalStatisticsByPopup(year, month);
         } catch (SQLException e) {
             throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다: " + e.getMessage());
         }

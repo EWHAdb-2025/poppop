@@ -22,7 +22,7 @@ public class DispRecRepository {
     }
 
     // insert
-    public boolean insertDisRec(DisposalRecord dr) {
+    public boolean insertDisposalRecord(DisposalRecord dr) {
         String sql = "insert INTO DB2025_DISPOSAL_RECORD(disposal_id, user_id, popup_id, waste_id, status, disposal_date) values (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, dr.getDisposalId());
@@ -66,7 +66,7 @@ public class DispRecRepository {
     }
 
     // search by month
-    public Optional<List<Map<String, Object>>> findDisposalRecordsByMonth(int year, int month) {
+    public Optional<List<Map<String, Object>>> getDisposalStatisticsByPopup(int year, int month) {
         String sql = """
             SELECT * FROM DB2025_DISPOSAL_RECORD
             WHERE YEAR(disposal_date) = ? AND MONTH(disposal_date) = ?
@@ -154,72 +154,11 @@ public class DispRecRepository {
         }
     }
 
-    public boolean insertDisposalRecord(DisposalRecord record) {
-        String sql = "insert INTO DB2025_DISPOSAL_RECORD(disposal_id, user_id, popup_id, status) " +
-                    "values (?, ?, ?, ?)";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, record.getDisposalId());
-            pstmt.setInt(2, record.getUserId());
-            pstmt.setInt(3, record.getPopupId());
-            pstmt.setString(4, record.getStatus());
-            pstmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            System.out.println("폐기물 처리 이력 등록 중 오류 발생: " + e.getMessage());
-            return false;
-        }
+
+
+    //TODO: 팝업별 폐기물 처리 통계 조회(waste, disposal record 다 보이게)
+    public Optional<List<Map<String, Object>>> getDisposalStatisticsByPopupname(String popupName) {
+        return Optional.empty();
     }
 
-    public List<Map<String, Object>> getDisposalStatisticsByCompany() {
-        List<Map<String, Object>> statistics = new ArrayList<>();
-        String sql = "select * from DB2025_Disposal_Company_View";
-        try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                Map<String, Object> stat = new HashMap<>();
-                stat.put("companyName", rs.getString("company_name"));
-                stat.put("totalDisposal", rs.getInt("total_disposal"));
-                statistics.add(stat);
-            }
-        } catch (SQLException e) {
-            System.out.println("업체별 통계 조회 중 오류 발생: " + e.getMessage());
-        }
-        return statistics;
-    }
-
-    public List<Map<String, Object>> getDisposalStatisticsByPopup() {
-        List<Map<String, Object>> statistics = new ArrayList<>();
-        String sql = "select * from DB2025_Popup_Company_View";
-        try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                Map<String, Object> stat = new HashMap<>();
-                stat.put("popupId", rs.getInt("popup_id"));
-                stat.put("totalDisposal", rs.getInt("total_disposal"));
-                statistics.add(stat);
-            }
-        } catch (SQLException e) {
-            System.out.println("팝업별 통계 조회 중 오류 발생: " + e.getMessage());
-        }
-        return statistics;
-    }
-
-    public List<Map<String, Object>> getDisposalStatisticsByMonth() {
-        List<Map<String, Object>> statistics = new ArrayList<>();
-        String sql = "select DATE_FORMAT(disposal_date, '%Y-%m') as month, " +
-                    "count(*) as total_disposal from DB2025_DISPOSAL_RECORD " +
-                    "group by DATE_FORMAT(disposal_date, '%Y-%m')";
-        try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-            while (rs.next()) {
-                Map<String, Object> stat = new HashMap<>();
-                stat.put("month", rs.getString("month"));
-                stat.put("totalDisposal", rs.getInt("total_disposal"));
-                statistics.add(stat);
-            }
-        } catch (SQLException e) {
-            System.out.println("월별 통계 조회 중 오류 발생: " + e.getMessage());
-        }
-        return statistics;
-    }
 }

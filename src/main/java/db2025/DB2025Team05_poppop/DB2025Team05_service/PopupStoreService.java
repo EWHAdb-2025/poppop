@@ -155,18 +155,6 @@ public class PopupStoreService {
         }
     }
 
-    /**
-     * 팝업스토어 조회
-     * 
-     * @param id 조회할 팝업스토어 ID
-     * @return 팝업스토어 정보 (Optional)
-     * @throws BusinessException 데이터베이스 오류 발생 시
-     */
-    public Optional<Map<String, Object>> findPopupById(int id) throws SQLException {
-        return popupRepository.findPopupById(id);
-
-    }
-
     // Private helper methods
 
     /**
