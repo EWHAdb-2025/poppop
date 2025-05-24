@@ -33,8 +33,8 @@ public class UserRepository {
         String sql = "INSERT INTO DB2025_USER (name, email, role) VALUES (?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, user.getName());
-            pstmt.setString(2, user.getEmail());
-            pstmt.setString(3, user.getRole().toString());
+            pstmt.setString(2, user.getRole().toString());
+            pstmt.setString(3, user.getEmail());
             
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows == 0) {
@@ -54,16 +54,16 @@ public class UserRepository {
 
     // search by user id
     public Optional<User> findByUserId(int userId) {
-        String sql = "select * from DB2025_USER where user_id=?";
+        String sql = "select * from DB2025_USER where id=?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, userId);
+            pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 User user = new User();
-                user.setId(rs.getInt("user_id"));
+                user.setId(rs.getInt("id"));
                 user.setName(rs.getString("name"));
-                user.setEmail(rs.getString("email"));
                 user.setRole(Role.valueOf(rs.getString("role").toUpperCase()));
+                user.setEmail(rs.getString("email"));
                 return Optional.of(user);
             }
         } catch (SQLException e) {
@@ -74,9 +74,9 @@ public class UserRepository {
 
     // delete
     public boolean deleteUser(int userId) {
-        String sql = "delete from DB2025_USER where user_id=?";
+        String sql = "delete from DB2025_USER where id=?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, userId);
+            pstmt.setInt(1, id);
             pstmt.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -108,7 +108,7 @@ public class UserRepository {
         }
 
         sql.setLength(sql.length() - 2);
-        sql.append(" WHERE user_id = ?");
+        sql.append(" WHERE id = ?");
         params.add(user.getId());
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
@@ -123,7 +123,7 @@ public class UserRepository {
         }
     }
 
-
+    // 이메일 주소로 사용자 조회
     public Optional<User> findByEmail(String email) throws SQLException {
         String sql = "SELECT * FROM DB2025_USER WHERE email = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -139,10 +139,10 @@ public class UserRepository {
 
     private User mapResultSetToUser(ResultSet rs) throws SQLException {
         User user = new User();
-        user.setId(rs.getInt("user_id"));
+        user.setId(rs.getInt("id"));
         user.setName(rs.getString("name"));
-        user.setEmail(rs.getString("email"));
         user.setRole(Role.fromString(rs.getString("role")));
+        user.setEmail(rs.getString("email"));
         return user;
     }
 }
