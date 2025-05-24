@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DisposalRecord {
     private int disposalId;
-    private int userId;
+    private int userId; // 폐기물 처리 업체의 user id
     private int popupId;
     private int wasteId;
     private String status;

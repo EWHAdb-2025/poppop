@@ -18,7 +18,7 @@ public class PopupRepository {
 
     // insert
     public PopupManagement insertPopup(PopupManagement popup) throws SQLException {
-        String sql = "INSERT INTO PopupManagement (user_id, name, address, start_date, end_date) VALUES (?, ?, ?, ?, ?)";
+        String sql = "insert into DB2025_POPUP_MANAGEMENT (user_id, name, address, start_date, end_date) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, popup.getUserId());
             pstmt.setString(2, popup.getName());
@@ -42,7 +42,7 @@ public class PopupRepository {
         }
     }
 
-    // search with view
+    // DB2025_POPUP_COMPANY_VIEW 로 팝업 & 폐기물 처리 관리 회사 통합 조회
     public Optional<Map<String, Object>> findPopupById(int popupId) {
         String sql = "select * from DB2025_POPUP_COMPANY_VIEW where popup_id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -51,11 +51,12 @@ public class PopupRepository {
             if (rs.next()) {
                 Map<String, Object> result = new HashMap<>();
                 result.put("popupId", rs.getInt("popup_id"));
-                result.put("address", rs.getString("popup_address"));
-                result.put("startDate", rs.getDate("popup_start_date").toLocalDate());
-                result.put("endDate", rs.getDate("popup_end_date").toLocalDate());
-                result.put("userName", rs.getString("user_name"));
+                result.put("popupName", rs.getString("popup_name"));
+                result.put("businessNumber", rs.getString("business_number"));
+                result.put("representativeName", rs.getString("representative_name"));
+                result.put("representativePhone", rs.getString("representative_phone"));
                 result.put("companyName", rs.getString("company_name"));
+                result.put("companyAddress", rs.getString("company_address"));
     
                 return Optional.of(result);
             }
@@ -65,10 +66,9 @@ public class PopupRepository {
         return Optional.empty();
     }
 
-    // search by popup name
+    // 팝업 이름으로 조회
     public Optional<List<Map<String, Object>>> findPopupByName(String popupName) {
-        String sql = "SELECT * FROM PopupManagement WHERE popup_name = ?";
-        // 인덱스: idx_popup_name 사용 (popup_name 컬럼 조건 조회)
+        String sql = "select * from DB2025_POPUP_MANAGEMENT where popup_name = ?"; // DB2025_POPUP_NAME_INDEX 사용
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, popupName);
             ResultSet rs = pstmt.executeQuery();
@@ -91,11 +91,8 @@ public class PopupRepository {
 
     // search by producer email
     public Optional<List<Map<String, Object>>> findPopupsByProducerEmail(String email) {
-        String sql = """
-            SELECT pm.* FROM PopupManagement pm
-            JOIN DB2025_USER u ON pm.user_id = u.user_id
-            WHERE u.email = ?
-        """;
+        String sql = "select pm.* FROM DB2025_POPUP_MANAGEMENT pm 
+                    join DB2025_USER u on pm.user_id = u.user_id where u.email = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);
             ResultSet rs = pstmt.executeQuery();
@@ -118,24 +115,53 @@ public class PopupRepository {
     
     // delete
     public boolean deletePopup(int id) throws SQLException {
-        String sql = "DELETE FROM PopupManagement WHERE id = ?";
+        String sql = "delete DB2025_POPUP_MANAGEMENT WHERE id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             return pstmt.executeUpdate() > 0;
         }
     }
 
-    // update (동적 쿼리 구현)
+    // 동적 쿼리 이용해 수정사항 있는 필드만 update
     public boolean updatePopup(PopupManagement popup) throws SQLException {
-        String sql = "UPDATE PopupManagement SET name = ?, address = ?, start_date = ?, end_date = ? WHERE id = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, popup.getName());
-            pstmt.setString(2, popup.getAddress());
-            pstmt.setDate(3, java.sql.Date.valueOf(popup.getStartDate()));
-            pstmt.setDate(4, java.sql.Date.valueOf(popup.getEndDate()));
-            pstmt.setInt(5, popup.getPopupId());
-            
-            return pstmt.executeUpdate() > 0;
+        StringBuilder sql = new StringBuilder("update DB2025_POPUP_MANAGEMENT set ");
+        List<Object> params = new ArrayList<>();
+
+        if(popup.getName() != null){
+            sql.append("name = ?, ")
+        }
+        if (popup.getAddress() != null && !popup.getAddress().isBlank()) {
+            sql.append("address = ?, ");
+            params.add(popup.getAddress());
+        }
+        if (popup.getStartDate() != null) {
+            sql.append("start_date = ?, ");
+            params.add(java.sql.Date.valueOf(popup.getStartDate()));
+        }
+        if (popup.getEndDate() != null) {
+            sql.append("end_date = ?, ");
+            params.add(java.sql.Date.valueOf(popup.getEndDate()));
+        }
+        if (params.isEmpty()) {
+            System.out.println("수정할 필드가 없습니다.");
+            return false;
+        }
+
+        sql.setLength(sql.length() - 2);
+        sql.append(" WHERE id = ?");
+        params.add(popup.getPopupId());
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
+
+            int rowsUpdated = pstmt.executeUpdate();
+            return rowsUpdated > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
