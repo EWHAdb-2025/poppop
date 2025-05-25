@@ -39,7 +39,7 @@ dependencies {
 	implementation 'org.openjfx:javafx-fxml:21.0.1'
 }
 javafx {
-	version = "24.0.1"
+	version = "21.0.1"
 	modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 tasks.named('test') {

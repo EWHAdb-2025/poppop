@@ -5,7 +5,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="400" prefWidth="400" spacing="12" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.ProcessorRegisterController">
+<VBox alignment="CENTER" prefHeight="400" prefWidth="400" spacing="12" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.ProcessorRegisterController">
 
     <children>
         <Label style="-fx-font-size: 20px;" text="폐기물 처리 업체 등록" />

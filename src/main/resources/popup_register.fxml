@@ -6,7 +6,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="350" prefWidth="400" spacing="12" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.PopupRegisterController">
+<VBox alignment="CENTER" prefHeight="350" prefWidth="400" spacing="12" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.PopupRegisterController">
     
     <children>
         <Label style="-fx-font-size: 20px;" text="팝업스토어 등록" />

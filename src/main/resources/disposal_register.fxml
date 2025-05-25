@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="300" prefWidth="400" spacing="12" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.DisposalRegisterController">
+<VBox alignment="CENTER" prefHeight="300" prefWidth="400" spacing="12" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.DisposalRegisterController">
 
     <children>
         <Label style="-fx-font-size: 20px;" text="폐기물 처리 이력 입력">

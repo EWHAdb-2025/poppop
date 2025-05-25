@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="400" prefWidth="400" spacing="12" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SignupBasicController">
+<VBox alignment="CENTER" prefHeight="400" prefWidth="400" spacing="12" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SignupBasicController">
     
     <children>
         <Label style="-fx-font-size: 20px;" text="POPCYCLE 회원가입" />
