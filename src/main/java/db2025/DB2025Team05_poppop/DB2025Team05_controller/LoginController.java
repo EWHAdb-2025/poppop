@@ -8,14 +8,18 @@ import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+
 import db2025.DB2025Team05_poppop.DB2025Team05_domain.*;
 import db2025.DB2025Team05_poppop.DB2025Team05_common.DBConnection;
 import db2025.DB2025Team05_poppop.DB2025Team05_service.UserService;
 import db2025.DB2025Team05_poppop.DB2025Team05_repository.UserRepository;
+import db2025.DB2025Team05_poppop.DB2025Team05_common.Role;
 
 import java.sql.Connection;
 import java.util.List;
-
 
 public class LoginController {
     @FXML private TextField emailField;
@@ -30,34 +34,31 @@ public class LoginController {
                             managerButton.isSelected() ? Role.MANAGER : null;
 
         if (email.isEmpty() || selectedRole == null) {
-            messageLabel.setText("ÀÌ¸ŞÀÏ°ú ¿ªÇÒÀ» ¼³Á¤ÇØÁÖ¼¼¿ä");
+            messageLabel.setText("ì´ë©”ì¼ê³¼ ì—­í• ì„ ì„¤ì •í•´ì£¼ì„¸ìš”");
             return;
         }
 
-        try {
-            Connection conn = DBConnection.getConnection();
-            UserRepository userRepository = new UserRepository(conn);
-            List<DB2025_USER> allUsers = userRepository.findAll();
+        try (Connection conn = DBConnection.getConnection()) {
+            // ì§ì ‘ SQLë¡œ ë¡œê·¸ì¸ ì²´í¬
+            String sql = "SELECT * FROM DB2025_USER WHERE email = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, email);
+            ResultSet rs = pstmt.executeQuery();
 
-            DB2025_USER matchedUser = null;
-            for (DB2025_USER user : allUsers) {
-                if (user.getEmail().equalsIgnoreCase(email)) {
-                    matchedUser = user;
-                    break;
-                }
-            }
-
-            if (matchedUser == null) {
-                messageLabel.setText("Á¸ÀçÇÏÁö ¾Ê´Â °èÁ¤ÀÔ´Ï´Ù.");
+            if (!rs.next()) {
+                messageLabel.setText("ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ê³„ì •ì…ë‹ˆë‹¤.");
                 return;
             }
 
-            if (matchedUser.getRole() != selectedRole) {
-                messageLabel.setText("¼±ÅÃÇÑ ¿ªÇÒÀÌ ¿Ã¹Ù¸£Áö ¾Ê½À´Ï´Ù.");
+            String roleStr = rs.getString("role");
+            Role dbRole = Role.fromString(roleStr);
+
+            if (dbRole != selectedRole) {
+                messageLabel.setText("ì„ íƒí•œ ì—­í• ì´ ì˜¬ë°”ë¥´ì§€ ì•ŠìŠµë‹ˆë‹¤.");
                 return;
             }
 
-            // ·Î±×ÀÎ ¼º°ø ¡æ ´ÙÀ½ È­¸é ÀüÈ¯
+            // ë¡œê·¸ì¸ì„±ê³µ, ë‹¤ìŒí™”ë©´ì „í™˜
             String fxml = (selectedRole == Role.PRODUCER) ? "/popup_register.fxml" : "/manager_home.fxml";
             Parent root = FXMLLoader.load(getClass().getResource(fxml));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -67,7 +68,7 @@ public class LoginController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            messageLabel.setText("·Î±×ÀÎ Ã³¸® Áß ¿À·ù ¹ß»ı");
+            messageLabel.setText("ë¡œê·¸ì¸ ì²˜ë¦¬ ì¤‘ ì˜¤ë¥˜ ë°œìƒ");
         }
     }
 
@@ -77,12 +78,11 @@ public class LoginController {
             Parent root = FXMLLoader.load(getClass().getResource("/signup_basic.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("È¸¿ø°¡ÀÔ");
+            stage.setTitle("íšŒì›ê°€ì…");
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
-            messageLabel.setText("È¸¿ø°¡ÀÔ È­¸é ¿À·ù");
+            messageLabel.setText("íšŒì›ê°€ì… í™”ë©´ ì˜¤ë¥˜");
         }
     }
-
 }

@@ -1,5 +1,4 @@
-package application;
-
+package db2025.DB2025Team05_poppop.DB2025Team05_controller;
 	
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -11,14 +10,13 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/popup_register.fxml"));
-            Scene scene = new Scene(root);
-            primaryStage.setTitle("√≥∏Ææ˜√º µÓ∑œ");
-            primaryStage.setScene(scene);
+            Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("login.fxml"));
+            primaryStage.setTitle("Î°úÍ∑∏Ïù∏");
+            primaryStage.setScene(new Scene(root));
             primaryStage.show();
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
-        }	
+        }
 	}
 	public static void main(String[] args) {
 		launch(args);

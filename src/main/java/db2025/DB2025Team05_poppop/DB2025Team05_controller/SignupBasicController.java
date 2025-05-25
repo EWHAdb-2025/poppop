@@ -1,88 +1,88 @@
-package db2025.DB2025Team05_poppop.DB2025Team05_controller;
-
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.*;
-import db2025.DB2025Team05_poppop.DB2025Team05_service.UserService;
-import db2025.DB2025Team05_poppop.DB2025Team05_common.DBConnection;
-
-import java.sql.Connection;
-
-public class SignupBasicController {
-    @FXML private TextField emailField;
-    @FXML private TextField nameField;
-    @FXML private ToggleButton producerButton;
-    @FXML private ToggleButton managerButton;
-    @FXML private Button nextButton;
-    @FXML private Label messageLabel;
-
-    @FXML
-    private void handleNext(ActionEvent event) {
-        String email = emailField.getText();
-        String name = nameField.getText();
-        Role role = producerButton.isSelected() ? Role.PRODUCER :
-                    managerButton.isSelected() ? Role.MANAGER : null;
-
-        if (email.isEmpty() || name.isEmpty()) {
-            messageLabel.setText("ÀÌ¸ŞÀÏ°ú ÀÌ¸§À» ÀÔ·ÂÇØÁÖ¼¼¿ä.");
-            return;
-        }
-
-        if (role == null) {
-            messageLabel.setText("¿ªÇÒÀ» ¼±ÅÃÇØÁÖ¼¼¿ä.");
-            return;
-        }
-
-        if (role == Role.MANAGER) {
-            // manager´Â ¿©±â¼­ ¹Ù·Î È¸¿ø°¡ÀÔ Ã³¸®
-            try {
-                DB2025_USER user = new DB2025_USER();
-                user.setEmail(email);
-                user.setName(name);
-                user.setRole(role);
-
-                Connection conn = DBConnection.getConnection();
-                UserService userService = new UserService(conn);
-
-                boolean result = userService.registerUser(user, null, null, null, null);
-
-                if (result) {
-                    messageLabel.setStyle("-fx-text-fill: green;");
-                    messageLabel.setText("È¸¿ø°¡ÀÔ ¿Ï·á!");
-                } else {
-                    messageLabel.setStyle("-fx-text-fill: red;");
-                    messageLabel.setText("È¸¿ø°¡ÀÔ ½ÇÆĞ (Áßº¹ ÀÌ¸ŞÀÏ µî)");
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                messageLabel.setText("È¸¿ø°¡ÀÔ Áß ¿À·ù ¹ß»ı");
-            }
-
-        } else {
-            // producer ¡æ È¸»ç Á¤º¸ ÀÔ·Â È­¸éÀ¸·Î ÀÌµ¿
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/signup_company.fxml"));
-                Parent root = loader.load();
-
-                SignupProducerController controller = loader.getController();
-                controller.setBasicInfo(email, name, role.name()); // StringÀ¸·Î ³Ñ±è
-
-                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-                stage.setScene(new Scene(root));
-                stage.setTitle("È¸»ç Á¤º¸ ÀÔ·Â");
-                stage.show();
-            } catch (Exception e) {
-                e.printStackTrace();
-                messageLabel.setText("È¸»ç Á¤º¸ È­¸é ÀüÈ¯ ½ÇÆĞ");
-            }
-        }
-    }
-}
+//package db2025.DB2025Team05_poppop.DB2025Team05_controller;
+//
+//import javafx.fxml.FXML;
+//import javafx.scene.control.*;
+//import javafx.scene.Parent;
+//import javafx.scene.Scene;
+//import javafx.stage.Stage;
+//import javafx.event.ActionEvent;
+//import javafx.fxml.FXMLLoader;
+//import javafx.scene.Node;
+//
+//import db2025.DB2025Team05_poppop.DB2025Team05_domain.*;
+//import db2025.DB2025Team05_poppop.DB2025Team05_service.UserService;
+//import db2025.DB2025Team05_poppop.DB2025Team05_common.DBConnection;
+//
+//import java.sql.Connection;
+//
+//public class SignupBasicController {
+//    @FXML private TextField emailField;
+//    @FXML private TextField nameField;
+//    @FXML private ToggleButton producerButton;
+//    @FXML private ToggleButton managerButton;
+//    @FXML private Button nextButton;
+//    @FXML private Label messageLabel;
+//
+//    @FXML
+//    private void handleNext(ActionEvent event) {
+//        String email = emailField.getText();
+//        String name = nameField.getText();
+//        Role role = producerButton.isSelected() ? Role.PRODUCER :
+//                    managerButton.isSelected() ? Role.MANAGER : null;
+//
+//        if (email.isEmpty() || name.isEmpty()) {
+//            messageLabel.setText("ì´ë©”ì¼ê³¼ ì´ë¦„ì„ ì…ë ¥í•´ì£¼ì„¸ìš”.");
+//            return;
+//        }
+//
+//        if (role == null) {
+//            messageLabel.setText("ì—­í• ì„ ì„ íƒí•´ì£¼ì„¸ìš”.");
+//            return;
+//        }
+//
+//        if (role == Role.MANAGER) {
+//            // managerëŠ” ì—¬ê¸°ì„œ ë°”ë¡œ íšŒì›ê°€ì… ì²˜ë¦¬
+//            try {
+//                DB2025_USER user = new DB2025_USER();
+//                user.setEmail(email);
+//                user.setName(name);
+//                user.setRole(role);
+//
+//                Connection conn = DBConnection.getConnection();
+//                UserService userService = new UserService(conn);
+//
+//                boolean result = userService.registerUser(user, null, null, null, null);
+//
+//                if (result) {
+//                    messageLabel.setStyle("-fx-text-fill: green;");
+//                    messageLabel.setText("íšŒì›ê°€ì… ì™„ë£Œ!");
+//                } else {
+//                    messageLabel.setStyle("-fx-text-fill: red;");
+//                    messageLabel.setText("íšŒì›ê°€ì… ì‹¤íŒ¨ (ì¤‘ë³µ ì´ë©”ì¼ ë“±)");
+//                }
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                messageLabel.setText("íšŒì›ê°€ì… ì¤‘ ì˜¤ë¥˜ ë°œìƒ");
+//            }
+//
+//        } else {
+//            // producer ï¿½ï¿½ È¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô·ï¿½ È­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½
+//            try {
+//                FXMLLoader loader = new FXMLLoader(getClass().getResource("/signup_company.fxml"));
+//                Parent root = loader.load();
+//
+//                SignupProducerController controller = loader.getController();
+//                controller.setBasicInfo(email, name, role.name()); // Stringï¿½ï¿½ï¿½ï¿½ ï¿½Ñ±ï¿½
+//
+//                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+//                stage.setScene(new Scene(root));
+//                stage.setTitle("íšŒì‚¬ ì •ë³´ ì…ë ¥");
+//                stage.show();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                messageLabel.setText("íšŒì‚¬ ì •ë³´ í™”ë©´ ì „í™˜ ì‹¤íŒ¨");
+//            }
+//        }
+//    }
+//}

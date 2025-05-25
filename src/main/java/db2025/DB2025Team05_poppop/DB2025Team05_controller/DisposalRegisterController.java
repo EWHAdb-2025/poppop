@@ -1,81 +1,81 @@
-package db2025.DB2025Team05_poppop.DB2025Team05_controller;
-
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.event.ActionEvent;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.*;
-import db2025.DB2025Team05_poppop.DB2025Team05_service.DisposalService;
-import db2025.DB2025Team05_poppop.DB2025Team05_common.DBConnection;
-
-import java.sql.Connection;
-import java.time.LocalDate;
-
-public class DisposalRegisterController {
-    @FXML private Label popupIdLabel;
-    @FXML private Label processorIdLabel;
-    @FXML private ComboBox<String> statusComboBox;
-    @FXML private DatePicker disposalDate;
-    @FXML private Label messageLabel;
-    
-    private int userId;         // manager ID
-    private int popupId;        // ÀÌÀü È­¸é¿¡¼­ Àü´Ş
-    private int processorId;    // ÀÌÀü È­¸é¿¡¼­ Àü´Ş
-
-    public void setUserId(int id) {
-        this.userId = id;
-    }
-
-    public void setPopupId(int popupId) {
-        this.popupId = popupId;
-        popupIdLabel.setText("ÆË¾÷ ID: " + popupId);
-    }
-
-    public void setProcessorId(int processorId) {
-        this.processorId = processorId;
-        processorIdLabel.setText("Ã³¸®¾÷Ã¼ ID: " + processorId);
-    }
-
-    @FXML
-    private void initialize() {
-        statusComboBox.getItems().addAll("´ë±â", "ÁøÇàÁß", "¿Ï·á");
-    }
-
-    @FXML
-    private void handleRegister(ActionEvent event) {
-        String status = statusComboBox.getValue();
-        LocalDate removeDate = removeDatePicker.getValue();
-
-        if (status == null || removeDate == null) {
-            messageLabel.setText("»óÅÂ¿Í Ã¶°ÅÀÏÀ» ÀÔ·ÂÇØÁÖ¼¼¿ä.");
-            return;
-        }
-
-        try {
-            DB2025_DISPOSAL_RECORD record = new DB2025_DISPOSAL_RECORD();
-            record.setUserId(userId);
-            record.setPopupId(popupId);
-            record.setProcessorId(processorId);
-            record.setStatus(status);
-            record.setRemoveDate(removeDate);
-
-            Connection conn = DBConnection.getConnection();
-            DisposalService service = new DisposalService(conn);
-
-            boolean result = service.registerDisposalRecord(record);
-            if (result) {
-                messageLabel.setStyle("-fx-text-fill: green;");
-                messageLabel.setText("Ã³¸® ÀÌ·Â µî·Ï ¿Ï·á!");
-            } else {
-                messageLabel.setStyle("-fx-text-fill: red;");
-                messageLabel.setText("µî·Ï ½ÇÆĞ (±ÇÇÑ or ÆË¾÷ Á¸Àç ¿À·ù)");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            messageLabel.setStyle("-fx-text-fill: red;");
-            messageLabel.setText("¿À·ù ¹ß»ı");
-        }
-    }
-
-
-}
+//package db2025.DB2025Team05_poppop.DB2025Team05_controller;
+//
+//import javafx.fxml.FXML;
+//
+//import javafx.scene.control.*;
+//import javafx.event.ActionEvent;
+//import db2025.DB2025Team05_poppop.DB2025Team05_domain.*;
+//import db2025.DB2025Team05_poppop.DB2025Team05_service.DisposalService;
+//import db2025.DB2025Team05_poppop.DB2025Team05_common.DBConnection;
+//
+//import java.sql.Connection;
+//import java.time.LocalDate;
+//
+//public class DisposalRegisterController {
+//    @FXML private Label popupIdLabel;
+//    @FXML private Label processorIdLabel;
+//    @FXML private ComboBox<String> statusComboBox;
+//    @FXML private DatePicker disposalDate;
+//    @FXML private Label messageLabel;
+//
+//    private int userId;         // manager ID
+//    private int popupId;        // ì´ì „ í™”ë©´ì—ì„œ ì „ë‹¬
+//    private int processorId;    // ì´ì „ í™”ë©´ì—ì„œ ì „ë‹¬
+//
+//    public void setUserId(int id) {
+//        this.userId = id;
+//    }
+//
+//    public void setPopupId(int popupId) {
+//        this.popupId = popupId;
+//        popupIdLabel.setText("íŒì—… ID: " + popupId);
+//    }
+//
+//    public void setProcessorId(int processorId) {
+//        this.processorId = processorId;
+//        processorIdLabel.setText("ì²˜ë¦¬ì—…ì²´ ID: " + processorId);
+//    }
+//
+//    @FXML
+//    private void initialize() {
+//        statusComboBox.getItems().addAll("ëŒ€ê¸°", "ì§„í–‰ì¤‘", "ì™„ë£Œ");
+//    }
+//
+//    @FXML
+//    private void handleRegister(ActionEvent event) {
+//        String status = statusComboBox.getValue();
+//        LocalDate removeDate = removeDatePicker.getValue();
+//
+//        if (status == null || removeDate == null) {
+//            messageLabel.setText("ìƒíƒœì™€ ì² ê±°ì¼ì„ ì…ë ¥í•´ì£¼ì„¸ìš”.");
+//            return;
+//        }
+//
+//        try {
+//            DB2025_DISPOSAL_RECORD record = new DB2025_DISPOSAL_RECORD();
+//            record.setUserId(userId);
+//            record.setPopupId(popupId);
+//            record.setProcessorId(processorId);
+//            record.setStatus(status);
+//            record.setRemoveDate(removeDate);
+//
+//            Connection conn = DBConnection.getConnection();
+//            DisposalService service = new DisposalService(conn);
+//
+//            boolean result = service.registerDisposalRecord(record);
+//            if (result) {
+//                messageLabel.setStyle("-fx-text-fill: green;");
+//                messageLabel.setText("ì²˜ë¦¬ ì´ë ¥ ë“±ë¡ ì™„ë£Œ!");
+//            } else {
+//                messageLabel.setStyle("-fx-text-fill: red;");
+//                messageLabel.setText("ë“±ë¡ ì‹¤íŒ¨ (ê¶Œí•œ or íŒì—… ì¡´ì¬ ì˜¤ë¥˜)");
+//            }
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            messageLabel.setStyle("-fx-text-fill: red;");
+//            messageLabel.setText("ì˜¤ë¥˜ ë°œìƒ");
+//        }
+//    }
+//
+//}

@@ -1,62 +1,62 @@
-package application;
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.event.ActionEvent;
-
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.*;
-import db2025.DB2025Team05_poppop.DB2025Team05_service.PopupStoreService;
-import db2025.DB2025Team05_poppop.DB2025Team05_common.DBConnection;
-
-import java.sql.Connection;
-import java.time.LocalDate;
-
-public class PopupRegisterController {
-    @FXML private TextField addressField;
-    @FXML private DatePicker startDatePicker;
-    @FXML private DatePicker endDatePicker;
-    @FXML private Label messageLabel;
-
-    private int userId; // ·Î±×ÀÎ ÈÄ Àü´Ş¹Ş¾Æ¾ß ÇÔ
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    @FXML
-    private void handleRegister(ActionEvent event) {
-        String address = addressField.getText();
-        LocalDate startDate = startDatePicker.getValue();
-        LocalDate endDate = endDatePicker.getValue();
-
-        if (address.isEmpty() || startDate == null || endDate == null) {
-            messageLabel.setText("¸ğµç Á¤º¸¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.");
-            return;
-        }
-
-        try {
-            DB2025_POPUP_MANAGEMENT popup = new DB2025_POPUP_MANAGEMENT();
-            popup.setUserId(userId);
-            popup.setPopupAddress(address);
-            popup.setStartDate(startDate);
-            popup.setEndDate(endDate);
-
-            Connection conn = DBConnection.getConnection();
-            PopupStoreService popupService = new PopupStoreService(conn);
-
-            boolean success = popupService.registerPopupStore(popup);
-
-            if (success) {
-                messageLabel.setStyle("-fx-text-fill: green;");
-                messageLabel.setText("ÆË¾÷½ºÅä¾î µî·Ï ¿Ï·á!");
-            } else {
-                messageLabel.setStyle("-fx-text-fill: red;");
-                messageLabel.setText("µî·Ï ½ÇÆĞ! (³¯Â¥ À¯È¿¼º ¶Ç´Â ±ÇÇÑ È®ÀÎ)");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            messageLabel.setStyle("-fx-text-fill: red;");
-            messageLabel.setText("ÆË¾÷ µî·Ï Áß ¿À·ù ¹ß»ı");
-        }
-    }
-}
+//package application;
+//import javafx.fxml.FXML;
+//import javafx.scene.control.*;
+//import javafx.event.ActionEvent;
+//
+//import db2025.DB2025Team05_poppop.DB2025Team05_domain.*;
+//import db2025.DB2025Team05_poppop.DB2025Team05_service.PopupStoreService;
+//import db2025.DB2025Team05_poppop.DB2025Team05_common.DBConnection;
+//
+//import java.sql.Connection;
+//import java.time.LocalDate;
+//
+//public class PopupRegisterController {
+//    @FXML private TextField addressField;
+//    @FXML private DatePicker startDatePicker;
+//    @FXML private DatePicker endDatePicker;
+//    @FXML private Label messageLabel;
+//
+//    private int userId;
+//
+//    public void setUserId(int userId) {
+//        this.userId = userId;
+//    }
+//
+//    @FXML
+//    private void handleRegister(ActionEvent event) {
+//        String address = addressField.getText();
+//        LocalDate startDate = startDatePicker.getValue();
+//        LocalDate endDate = endDatePicker.getValue();
+//
+//        if (address.isEmpty() || startDate == null || endDate == null) {
+//            messageLabel.setText("ëª¨ë“  ì •ë³´ë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.");
+//            return;
+//        }
+//
+//        try {
+//            DB2025_POPUP_MANAGEMENT popup = new DB2025_POPUP_MANAGEMENT();
+//            popup.setUserId(userId);
+//            popup.setPopupAddress(address);
+//            popup.setStartDate(startDate);
+//            popup.setEndDate(endDate);
+//
+//            Connection conn = DBConnection.getConnection();
+//            PopupStoreService popupService = new PopupStoreService(conn);
+//
+//            boolean success = popupService.registerPopupStore(popup);
+//
+//            if (success) {
+//                messageLabel.setStyle("-fx-text-fill: green;");
+//                messageLabel.setText("íŒì—…ìŠ¤í† ì–´ ë“±ë¡ ì™„ë£Œ!");
+//            } else {
+//                messageLabel.setStyle("-fx-text-fill: red;");
+//                messageLabel.setText("ë“±ë¡ ì‹¤íŒ¨! (ë‚ ì§œ ìœ íš¨ì„± ë˜ëŠ” ê¶Œí•œ í™•ì¸)");
+//            }
+//
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            messageLabel.setStyle("-fx-text-fill: red;");
+//            messageLabel.setText("íŒì—… ë“±ë¡ ì¤‘ ì˜¤ë¥˜ ë°œìƒ");
+//        }
+//    }
+//}
