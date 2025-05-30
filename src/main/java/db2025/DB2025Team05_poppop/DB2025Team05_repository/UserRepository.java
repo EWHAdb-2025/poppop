@@ -56,7 +56,7 @@ public class UserRepository {
     public Optional<User> findByUserId(int userId) {
         String sql = "select * from DB2025_USER where id=?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, userId);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 User user = new User();
@@ -76,7 +76,7 @@ public class UserRepository {
     public boolean deleteUser(int userId) {
         String sql = "delete from DB2025_USER where id=?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, userId);
             pstmt.executeUpdate();
             return true;
         } catch (SQLException e) {
@@ -145,4 +145,15 @@ public class UserRepository {
         user.setEmail(rs.getString("email"));
         return user;
     }
+    public List<User> findAllProcessors() throws SQLException {
+        List<User> results = new ArrayList<>();
+        String sql = "SELECT * FROM DB2025_USER WHERE role = 'PROCESSOR'";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                results.add(mapResultSetToUser(rs));
+            }
+        }
+        return results;
+    }   //처리 이력 입력 메소드
 }

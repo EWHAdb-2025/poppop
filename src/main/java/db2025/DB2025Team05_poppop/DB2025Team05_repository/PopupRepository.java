@@ -7,6 +7,7 @@ import java.sql.*;
 import java.util.*;
 import java.util.Optional;
 import org.springframework.stereotype.Repository;
+import lombok.*;
 
 @Repository
 public class PopupRepository {
@@ -91,8 +92,7 @@ public class PopupRepository {
 
     // search by producer email
     public Optional<List<Map<String, Object>>> findPopupsByProducerEmail(String email) {
-        String sql = "select pm.* FROM DB2025_POPUP_MANAGEMENT pm 
-                    join DB2025_USER u on pm.user_id = u.user_id where u.email = ?";
+        String sql = "select pm.* FROM DB2025_POPUP_MANAGEMENT pm join DB2025_USER u on pm.user_id = u.user_id where u.email = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);
             ResultSet rs = pstmt.executeQuery();
@@ -128,7 +128,7 @@ public class PopupRepository {
         List<Object> params = new ArrayList<>();
 
         if(popup.getName() != null){
-            sql.append("name = ?, ")
+            sql.append("name = ?, ");
         }
         if (popup.getAddress() != null && !popup.getAddress().isBlank()) {
             sql.append("address = ?, ");
@@ -164,6 +164,25 @@ public class PopupRepository {
             return false;
         }
     }
+
+    public List<PopupManagement> findAllBasic() throws SQLException {
+        List<PopupManagement> results = new ArrayList<>();
+        String sql = "SELECT * FROM PopupManagement";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                PopupManagement popup = new PopupManagement();
+                popup.setPopupId(rs.getInt("popup_id"));
+                popup.setName(rs.getString("name"));
+                popup.setAddress(rs.getString("address"));
+                popup.setStartDate(rs.getDate("start_date").toLocalDate());
+                popup.setEndDate(rs.getDate("end_date").toLocalDate());
+                popup.setUserId(rs.getInt("user_id"));
+                results.add(popup);
+            }
+        }
+        return results;
+    } //처리 이력 입력 메소드
 
 
 }

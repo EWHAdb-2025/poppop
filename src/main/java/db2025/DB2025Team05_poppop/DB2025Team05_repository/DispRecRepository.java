@@ -23,9 +23,9 @@ public class DispRecRepository {
 
     // insert
     public boolean insertDisposalRecord(DisposalRecord dr) {
-        String sql = "insert INTO DB2025_DISPOSAL_RECORD(id, user_id, popup_id, waste_id, status, disposal_date) values (?, ?, ?, ?, ?, ?)";
+        String sql = "insert INTO DB2025_DISPOSAL_RECORD(disposal_id, user_id, popup_id, waste_id, status, disposal_date) values (?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, dr.getId());
+            pstmt.setInt(1, dr.getDisposalId());
             pstmt.setInt(2, dr.getUserId());
             pstmt.setInt(3, dr.getPopupId());
             pstmt.setInt(4, dr.getWasteId());
@@ -39,9 +39,38 @@ public class DispRecRepository {
         }
     }
 
-    // 기간으로 폐기물 처리 정보 조회 (index 사용)
-    public Optional<List<Map<String, Object>>> getDisposalStatisticsByMonth(int year, int month) {
-        String sql = "select * from DB2025_DISPOSAL_RECORD where YEAR(disposal_date) = ? AND MONTH(disposal_date) = ?";
+    // search using view
+    public Optional<Map<String, Object>> findDisRecByDisRecId(int disRecId) {
+        String sql = "select * from DB2025_DISPOSAL_COMPANY_VIEW where disposal_id=?";
+        try(PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, disRecId);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                Map<String, Object> result = new HashMap<>();
+                result.put("disposalId", rs.getInt("disposal_id"));
+                result.put("userId", rs.getInt("user_id"));
+                result.put("userName", rs.getString("user_name"));
+                result.put("companyName", rs.getString("company_name"));
+                result.put("popupId", rs.getInt("popup_id"));
+                result.put("status", rs.getString("status"));
+
+                Timestamp ts = rs.getTimestamp("disposal_date");
+                result.put("disposalDate", ts != null ? ts.toLocalDateTime() : null);
+
+                return Optional.of(result);
+            }
+        } catch(SQLException e) {
+            System.out.println("조회 오류: "+e.getMessage());
+        }
+        return Optional.empty();
+    }
+
+    // search by month
+    public Optional<List<Map<String, Object>>> getDisposalStatisticsByPopup(int year, int month) {
+        String sql = """
+            SELECT * FROM DB2025_DISPOSAL_RECORD
+            WHERE YEAR(disposal_date) = ? AND MONTH(disposal_date) = ?
+        """;
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, year);
             pstmt.setInt(2, month);
@@ -49,7 +78,7 @@ public class DispRecRepository {
             List<Map<String, Object>> results = new ArrayList<>();
             while (rs.next()) {
                 Map<String, Object> record = new HashMap<>();
-                record.put("id", rs.getInt("id"));
+                record.put("disposalId", rs.getInt("disposal_id"));
                 record.put("popupId", rs.getInt("popup_id"));
                 record.put("status", rs.getString("status"));
                 record.put("disposalDate", rs.getTimestamp("disposal_date").toLocalDateTime());
@@ -64,7 +93,7 @@ public class DispRecRepository {
 
     // delete
     public boolean deleteDisRec(int disRecId) {
-        String sql = "delete from DB2025_DISPOSAL_RECORD where id=?";
+        String sql = "delete from DB2025_DISPOSAL_RECORD where disposal_id=?";
 
         try(PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, disRecId);
@@ -77,7 +106,7 @@ public class DispRecRepository {
         }
     }
 
-    // 동적 쿼리 사용해 수정된 필드만 update
+    // update (dynamic query)
     public boolean updateDisposalRecord(DisposalRecord dr) {
         StringBuilder sql = new StringBuilder("UPDATE DB2025_DISPOSAL_RECORD SET ");
         List<Object> params = new ArrayList<>();
@@ -108,8 +137,8 @@ public class DispRecRepository {
         }
 
         sql.setLength(sql.length() - 2);
-        sql.append(" WHERE id = ?");
-        params.add(dr.getId());
+        sql.append(" WHERE disposal_id = ?");
+        params.add(dr.getDisposalId());
     
         try (PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
@@ -126,56 +155,15 @@ public class DispRecRepository {
     }
 
 
-    // DB2025_DISPOSAL_VIEW 이용해 팝업별 폐기물 처리 정보 조회
+
+    //TODO: 팝업별 폐기물 처리 통계 조회(waste, disposal record 다 보이게)
     public Optional<List<Map<String, Object>>> getDisposalStatisticsByPopupname(String popupName) {
-        String sql = "select popup_name, type, amount, status, disposal_date from DB2025_DISPOSAL_VIEW where popup_name = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, popupName)
-            ResultSet rs = pstmt.executeQuery();
-            List<Map<String, Object>> results = new ArrayList<>();
-            while (rs.next()) {
-                Map<String, Object> record = new HashMap<>();
-                record.put("popupName", rs.getString("popup_name"));
-                record.put("type", rs.getString("type"));
-                record.put("amount", rs.getInt("amount"));
-                record.put("status", rs.getString("status"));
-
-                Timestamp ts = rs.getTimestamp("disposal_date");
-                result.put("disposalDate", ts != null ? ts.toLocalDateTime() : null);
-
-                results.add(record);
-            }
-            return Optional.of(results);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
         return Optional.empty();
     }
 
-    // DB2025_DISPOSAL_VIEW 이용해 회사별 폐기물 처리 정보 조회
-    public Optional<List<Map<String, Object>>> getDisposalStatisticsByCompanyname(String companyName) {
-        String sql = "select company_name, popup_name, type, amount, status, disposal date from DB2025_DISPOSAL_VIEW where company_name = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, popupName)
-            ResultSet rs = pstmt.executeQuery();
-            List<Map<String, Object>> results = new ArrayList<>();
-            while (rs.next()) {
-                Map<String, Object> record = new HashMap<>();
-                record.put("companyName", rs.getString("company_name"));
-                record.put("popupName", rs.getString("popup_name"));
-                record.put("type", rs.getString("type"));
-                record.put("amount", rs.getInt("amount"));
-                record.put("status", rs.getString("status"));
-
-                Timestamp ts = rs.getTimestamp("disposal_date");
-                result.put("disposalDate", ts != null ? ts.toLocalDateTime() : null);
-
-                results.add(record);
-            }
-            return Optional.of(results);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+    //TODO: 회사별 폐기물 처리 통계 조회(waste, disposal record 다 보이게)
+    public Optional<List<Map<String, Object>>> getDisposalStatisticsByCompanyname(String companyname) {
         return Optional.empty();
     }
+
 }
