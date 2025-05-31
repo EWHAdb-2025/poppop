@@ -56,7 +56,7 @@ public class UserRepository {
     public Optional<User> findByUserId(int userId) {
         String sql = "select * from DB2025_USER where id=?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, userId);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 User user = new User();
@@ -76,7 +76,7 @@ public class UserRepository {
     public boolean deleteUser(int userId) {
         String sql = "delete from DB2025_USER where id=?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, userId);
             pstmt.executeUpdate();
             return true;
         } catch (SQLException e) {

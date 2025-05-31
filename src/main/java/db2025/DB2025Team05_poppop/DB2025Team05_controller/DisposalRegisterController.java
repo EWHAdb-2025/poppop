@@ -20,7 +20,7 @@ import javafx.scene.control.Label;
 import java.time.LocalDate;
 import java.util.List;
 
-public class DisposalRegisterController {
+public class DisposalRegisterController extends BaseController {
 
     @FXML private ComboBox<User> processorComboBox;
     @FXML private ComboBox<PopupManagement> popupComboBox;

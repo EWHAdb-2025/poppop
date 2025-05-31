@@ -1,7 +1,13 @@
 package db2025.DB2025Team05_poppop.DB2025Team05_controller;
 
+import db2025.DB2025Team05_poppop.DB2025Team05_common.AppSession;
 import db2025.DB2025Team05_poppop.DB2025Team05_common.DBConnection;
 import db2025.DB2025Team05_poppop.DB2025Team05_common.Role;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.User;
+import db2025.DB2025Team05_poppop.DB2025Team05_exception.BusinessException;
+import db2025.DB2025Team05_poppop.DB2025Team05_repository.CompanyRepository;
+import db2025.DB2025Team05_poppop.DB2025Team05_repository.UserRepository;
+import db2025.DB2025Team05_poppop.DB2025Team05_service.UserService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -16,6 +22,7 @@ import javafx.stage.Stage;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class LoginController {
     @FXML private TextField emailField;
@@ -34,27 +41,20 @@ public class LoginController {
             return;
         }
 
-        try (Connection conn = DBConnection.getConnection()) {
-            // 직접 SQL로 로그인 체크
-            String sql = "SELECT * FROM DB2025_USER WHERE email = ?";
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, email);
-            ResultSet rs = pstmt.executeQuery();
+        try {
+            /// ✅ 서비스 계층 사용
+            UserService userService = new UserService(new UserRepository(), new CompanyRepository());
+            User user = userService.loginWithEmail(email);
 
-            if (!rs.next()) {
-                messageLabel.setText("존재하지 않는 계정입니다.");
-                return;
-            }
-
-            String roleStr = rs.getString("role");
-            Role dbRole = Role.fromString(roleStr);
-
-            if (dbRole != selectedRole) {
+            if (user.getRole() != selectedRole) {
                 messageLabel.setText("선택한 역할이 올바르지 않습니다.");
                 return;
             }
 
-            // 로그인성공, 다음화면전환
+            // 로그인 성공 → AppSession 저장
+            AppSession.login(user);
+
+            // 화면 전환
             String fxml = (selectedRole == Role.PRODUCER) ? "/popup_register.fxml" : "/manager_home.fxml";
             Parent root = FXMLLoader.load(getClass().getResource(fxml));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
@@ -62,9 +62,9 @@ public class LoginController {
             stage.setTitle(selectedRole.toString());
             stage.show();
 
-        } catch (Exception e) {
+        } catch (BusinessException | SQLException e) {
+            messageLabel.setText(e.getMessage());
             e.printStackTrace();
-            messageLabel.setText("로그인 처리 중 오류 발생");
         }
     }
 

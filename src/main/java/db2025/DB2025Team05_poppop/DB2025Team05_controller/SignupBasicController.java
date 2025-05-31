@@ -19,7 +19,7 @@ import javafx.stage.Stage;
 
 import java.SignupProducerController;
 
-public class SignupBasicController {
+public class SignupBasicController extends BaseController {
 
     @FXML private TextField emailField;
     @FXML private TextField nameField;

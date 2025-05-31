@@ -93,6 +93,20 @@ public class UserService {
         }
     }
 
+    //로그인
+    public User loginWithEmail(String email) {
+        try {
+            Optional<User> userOpt = userRepository.findByEmail(email);
+            if (userOpt.isEmpty()) {
+                throw new BusinessException(ErrorCode.USER_NOT_FOUND, "등록되지 않은 이메일입니다.");
+            }
+            return userOpt.get();
+        } catch (SQLException e) {
+            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "로그인 중 오류 발생: " + e.getMessage());
+        }
+    }
+
+
     /**
      * 폐기물 처리 업체 등록 (관리자 전용)
      * 

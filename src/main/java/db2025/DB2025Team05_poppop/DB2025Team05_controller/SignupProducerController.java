@@ -16,7 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-public class SignupProducerController {
+public class SignupProducerController extends BaseController {
 
     @FXML private TextField companyNameField;
     @FXML private TextField bizNumberField;
