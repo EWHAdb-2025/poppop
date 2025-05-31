@@ -2,30 +2,41 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 
-<VBox alignment="CENTER" prefHeight="300" prefWidth="400" spacing="12" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.DisposalRegisterController">
+<AnchorPane prefWidth="960" prefHeight="540"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.DisposalRegisterController"
+            stylesheets="@/css/styles.css">
 
     <children>
-        <Label style="-fx-font-size: 20px;" text="폐기물 처리 이력 입력">
-            <font>
-                <Font size="24.0" />
-            </font></Label>
+        <VBox alignment="CENTER" spacing="16"
+              layoutX="180" layoutY="60" prefWidth="600" prefHeight="420"
+              styleClass="card">
 
-        <ComboBox fx:id="popupComboBox" editable="true" prefWidth="150.0" promptText="팝업스토어 선택" />
-        <ComboBox fx:id="processorComboBox" editable="true" prefWidth="150.0" promptText="처리 업체 선택" />
+            <children>
 
-        <TextField fx:id="wasteTypeField" prefWidth="200"
-                   promptText="폐기물 타입 입력"/>
+                <Label text="폐기물 처리 이력 입력" styleClass="label-title" />
 
-        <TextField fx:id="amountField" prefWidth="200"
-                   promptText="처리량 (kg) 입력"/>
-        <DatePicker fx:id="disposalDate" promptText="처리 일자 선택" />
-        <ComboBox fx:id="statusComboBox" editable="true" prefWidth="150.0" promptText="처리 상태 선택" />
+                <ComboBox fx:id="popupComboBox" editable="true" promptText="팝업스토어 선택" styleClass="input" />
+                <ComboBox fx:id="processorComboBox" editable="true" promptText="처리 업체 선택" styleClass="input" />
 
+                <TextField fx:id="wasteTypeField" promptText="폐기물 타입 입력" styleClass="input" />
+                <TextField fx:id="amountField" promptText="처리량 (kg) 입력" styleClass="input" />
 
-        <Button onAction="#handleRegister" text="등록" />
-        <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="이전" />
-        <Label fx:id="messageLabel" style="-fx-text-fill: red;" text="" />
+                <DatePicker fx:id="disposalDate" promptText="처리 일자 선택" styleClass="input" />
+                <ComboBox fx:id="statusComboBox" editable="true" promptText="처리 상태 선택" styleClass="input" />
+
+                <HBox spacing="14" alignment="CENTER">
+                    <children>
+                        <Button fx:id="backButton" text="이전" onAction="#handleBack" styleClass="button-secondary" />
+                        <Button text="등록" onAction="#handleRegister" styleClass="button-primary" />
+                    </children>
+                </HBox>
+
+                <Label fx:id="messageLabel" text="" styleClass="label-error" />
+
+            </children>
+        </VBox>
     </children>
-</VBox>
+</AnchorPane>

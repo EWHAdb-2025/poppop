@@ -3,27 +3,41 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" prefHeight="300" prefWidth="400" spacing="12" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.LoginController">
+<AnchorPane prefWidth="960" prefHeight="540"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.LoginController"
+            stylesheets="@/css/styles.css">
 
     <children>
-        <Label style="-fx-font-size: 20px;" text="LOGIN" />
+        <VBox alignment="CENTER" spacing="20"
+              layoutX="180" layoutY="90" prefWidth="600" prefHeight="360"
+              style="-fx-background-color: #ffffff; -fx-background-radius: 16; -fx-padding: 36; -fx-border-color: #e0e0e0; -fx-border-radius: 16;">
 
-        <Label text="역할 선택" />
-        <HBox alignment="CENTER" spacing="10">
             <children>
-                <ToggleButton fx:id="producerButton" text="producer" />
-                <ToggleButton fx:id="managerButton" text="manager" />
-            </children>
-        </HBox>
-        <TextField fx:id="emailField" promptText="이메일(ID)" text="email(ID)" />
 
-        <HBox alignment="CENTER_RIGHT" spacing="10">
-            <children>
-                <Button fx:id="loginButton" onAction="#handleLogin" text="로그인" />
-                <Button fx:id="signupButton" onAction="#handleSignup" text="회원가입" />
-            </children>
-        </HBox>
+                <Label text="LOGIN" styleClass="label-title" />
 
-        <Label fx:id="messageLabel" style="-fx-text-fill: red;" text="" />
+                <HBox alignment="CENTER" spacing="16">
+                    <children>
+                        <ToggleButton fx:id="producerButton" text="producer" styleClass="toggle-green" />
+                        <ToggleButton fx:id="managerButton" text="manager" styleClass="toggle-green" />
+                    </children>
+                </HBox>
+
+                <TextField fx:id="emailField" promptText="이메일(ID)" styleClass="input" />
+
+                <HBox alignment="CENTER_RIGHT" spacing="16">
+                    <children>
+                        <Button fx:id="loginButton" text="로그인" onAction="#handleLogin" styleClass="button-primary" />
+                        <Button fx:id="signupButton" text="회원가입" onAction="#handleSignup" styleClass="button-secondary" />
+                    </children>
+                </HBox>
+
+                <Label fx:id="messageLabel" text=""
+                       style="-fx-text-fill: #d32f2f; -fx-font-size: 12px; -fx-font-family: 'Segoe UI', 'Noto Sans KR';" />
+
+            </children>
+        </VBox>
     </children>
-</VBox>
+</AnchorPane>

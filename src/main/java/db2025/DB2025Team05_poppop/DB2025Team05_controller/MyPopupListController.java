@@ -133,25 +133,30 @@ public class MyPopupListController extends BaseController {
         PopupManagement selected = popupTable.getSelectionModel().getSelectedItem();
         if (selected == null) return;
 
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "팝업 '" + selected.getName() + "'을(를) 삭제하시겠습니까?",
-                ButtonType.YES, ButtonType.NO);
-        confirm.setHeaderText(null);
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/popup_delete.fxml"));
+            Parent root = loader.load();
 
-        confirm.showAndWait().ifPresent(btn -> {
-            if (btn == ButtonType.YES) {
-                try {
-                    popupStoreService.deletePopupStore(
-                            selected.getPopupId(),
-                            currentUser.getId()
-                    );
-                    loadTable();
-                } catch (BusinessException be) {
-                    showAlert(be.getMessage());
-                }
-            }
-        });
+            // 삭제 컨트롤러에 popupId 주입
+            PopupDeleteController popupDeleteController = loader.getController();
+            popupDeleteController.setPopup(selected);
+
+            // 모달 창으로 삭제 다이얼로그 실행
+            Stage dialog = new Stage();
+            dialog.initOwner(((Node) e.getSource()).getScene().getWindow());
+            dialog.initModality(Modality.WINDOW_MODAL);
+            dialog.setScene(new Scene(root));
+            dialog.setTitle("팝업 삭제");
+            dialog.showAndWait();
+
+            loadTable(); // 삭제 이후 목록 갱신
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            showAlert("삭제 화면을 여는 데 실패했습니다.");
+        }
     }
+
 
     private void showAlert(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

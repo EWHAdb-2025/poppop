@@ -3,13 +3,30 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" prefHeight="300" prefWidth="400" spacing="20" style="-fx-padding: 30;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.ManagerHomeController">
+<AnchorPane prefWidth="960" prefHeight="540"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.ManagerHomeController"
+            stylesheets="@/css/styles.css">
 
-    <Label style="-fx-font-size: 24px; -fx-text-fill: #333;" text="매니저 홈" />
+    <children>
+        <VBox alignment="CENTER" spacing="20"
+              layoutX="180" layoutY="90" prefWidth="600" prefHeight="360"
+              styleClass="card">
 
-    <Button fx:id="registerProcessorBtn" onAction="#handleRegisterProcessor" prefWidth="200" text="처리자 등록" />
-    <Button fx:id="disposalRecordBtn" onAction="#handleDisposalRecord" prefWidth="200" text="폐기물 처리 이력 입력" />
-    <Button fx:id="statisticsBtn" onAction="#handleStatistics" prefWidth="200" text="폐기물 통계 조회" />
-    <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="이전" />
+            <children>
+                <Label text="Manager Home" styleClass="label-title" />
 
-</VBox>
+                <Button fx:id="registerProcessorBtn" onAction="#handleRegisterProcessor"
+                        text="처리자 등록" styleClass="button-primary" />
+                <Button fx:id="disposalRecordBtn" onAction="#handleDisposalRecord"
+                        text="폐기물 처리 이력 입력" styleClass="button-primary" />
+                <Button fx:id="statisticsBtn" onAction="#handleStatistics"
+                        text="폐기물 통계 조회" styleClass="button-primary" />
+
+                <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack"
+                        text="이전" styleClass="button-secondary" />
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

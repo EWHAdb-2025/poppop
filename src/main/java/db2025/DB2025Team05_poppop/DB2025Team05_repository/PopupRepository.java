@@ -140,10 +140,10 @@ public class PopupRepository {
     }
 
     // delete
-    public boolean deletePopup(int id) throws SQLException {
-        String sql = "delete DB2025_POPUP_MANAGEMENT WHERE id = ?";
+    public boolean deletePopup(PopupManagement popup) throws SQLException {
+        String sql = "delete FROM DB2025_POPUP_MANAGEMENT WHERE id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, id);
+            pstmt.setInt(1, popup.getPopupId());
             return pstmt.executeUpdate() > 0;
         }
     }
@@ -155,6 +155,7 @@ public class PopupRepository {
 
         if(popup.getName() != null){
             sql.append("name = ?, ");
+            params.add(popup.getName());
         }
         if (popup.getAddress() != null && !popup.getAddress().isBlank()) {
             sql.append("address = ?, ");

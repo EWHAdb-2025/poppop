@@ -192,14 +192,20 @@ public class DisposalStatsController extends BaseController {
             Object value = param.getValue().get("popupName");
             return new javafx.beans.property.SimpleStringProperty(String.valueOf(value));
         });
-
-        TableColumn<Map<String, Object>, String> col2 = new TableColumn<>("처리량 (kg)");
+        //type
+        TableColumn<Map<String, Object>, String> col2 = new TableColumn<>("폐기물 종류");
         col2.setCellValueFactory(param -> {
+            Object value = param.getValue().get("type");
+            return new javafx.beans.property.SimpleStringProperty(String.valueOf(value));
+        });
+
+        TableColumn<Map<String, Object>, String> col3 = new TableColumn<>("처리량 (kg)");
+        col3.setCellValueFactory(param -> {
             Object value = param.getValue().get("amount"); // key must exist in Map
             return new SimpleStringProperty(String.valueOf(value));
         });
 
-        statsTableView.getColumns().addAll(col1, col2);
+        statsTableView.getColumns().addAll(col1, col2, col3);
 
         ObservableList<Map<String, Object>> observableList = FXCollections.observableArrayList(data);
         statsTableView.setItems(observableList);

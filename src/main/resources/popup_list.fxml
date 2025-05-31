@@ -3,29 +3,38 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.MyPopupListController">
+<BorderPane prefWidth="960" prefHeight="540"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.MyPopupListController"
+            stylesheets="@/css/styles.css">
 
     <top>
-        <Label style="-fx-font-size: 22px; -fx-padding: 15 0 10 0;" text="내 팝업스토어 목록" BorderPane.alignment="CENTER" />
+        <Label text="My PopStore"
+               BorderPane.alignment="CENTER"
+               styleClass="label-title"
+               style="-fx-padding: 20 0 10 0;" />
     </top>
 
     <center>
-        <TableView fx:id="popupTable" prefHeight="300" prefWidth="600">
+        <TableView fx:id="popupTable" prefHeight="340" prefWidth="800" style="-fx-padding: 10;">
             <columns>
-                <TableColumn fx:id="colName" prefWidth="140" text="팝업명" />
-                <TableColumn fx:id="colAddress" prefWidth="170.99998474121094" text="주소" />
-                <TableColumn fx:id="colStartDate" prefWidth="145.0" text="시작일" />
-                <TableColumn fx:id="colEndDate" prefWidth="144.0" text="종료일" />
+                <TableColumn fx:id="colName" prefWidth="180" text="팝업명" />
+                <TableColumn fx:id="colAddress" prefWidth="240" text="주소" />
+                <TableColumn fx:id="colStartDate" prefWidth="190" text="시작일" />
+                <TableColumn fx:id="colEndDate" prefWidth="190" text="종료일" />
             </columns>
         </TableView>
     </center>
 
     <bottom>
-        <HBox alignment="CENTER" spacing="10" style="-fx-padding: 15 0 20 0;" BorderPane.alignment="CENTER">
-            <Button fx:id="backButton" onAction="#handleBack" text="이전" />
-            <Region HBox.hgrow="ALWAYS" />  <!-- 가운데 여백용 -->
-            <Button fx:id="editButton" onAction="#handleEdit" text="수정" />
-            <Button fx:id="deleteButton" onAction="#handleDelete" text="삭제" />
+        <HBox alignment="CENTER" spacing="12"
+              BorderPane.alignment="CENTER"
+              style="-fx-padding: 20 0 30 0;">
+            <Button fx:id="backButton" text="이전" onAction="#handleBack" styleClass="button-secondary" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="editButton" text="수정" onAction="#handleEdit" styleClass="button-primary" />
+            <Button fx:id="deleteButton" text="삭제" onAction="#handleDelete" styleClass="button-danger" />
         </HBox>
     </bottom>
 

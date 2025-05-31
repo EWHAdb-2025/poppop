@@ -100,7 +100,6 @@ public class PopupRegisterController extends BaseController{
             messageLabel.setStyle("-fx-text-fill: green;");
             messageLabel.setText("팝업 등록 성공!");
 
-            // TODO: 이후 화면 전환이나 목록 갱신 필요 시 여기에 작성
 
         } catch (BusinessException e) {
             messageLabel.setStyle("-fx-text-fill: red;");
