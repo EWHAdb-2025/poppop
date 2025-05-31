@@ -17,8 +17,7 @@ public class CompanyRepository {
     }
 
     // insert
-    public boolean insertCompanyInfo(int userId, String companyName, String businessNumber, 
-                                   String representativeName, String representativePhone) {
+    public boolean insertCompanyInfo(int userId, String companyName, String businessNumber, String representativeName, String representativePhone) {
         String sql = "insert INTO DB2025_COMPANY_INFO(user_id, company_name, business_number, representative_name, representative_phone) values (?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
@@ -91,7 +90,7 @@ public class CompanyRepository {
         }
         if(comp.getRepresentativePhone() !=null){
             sql.append("representative_phone = ?, ");
-            params.add(comp.getRepresentativePhone())
+            params.add(comp.getRepresentativePhone());
         }
         if (params.isEmpty()) {
             System.out.println("수정할 필드가 없습니다.");
