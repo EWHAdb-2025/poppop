@@ -1,5 +1,6 @@
 package db2025.DB2025Team05_poppop.DB2025Team05_controller;
 
+import db2025.DB2025Team05_poppop.DB2025Team05_common.AppSession;
 import db2025.DB2025Team05_poppop.DB2025Team05_common.Role;
 import db2025.DB2025Team05_poppop.DB2025Team05_domain.CompanyInfo;
 import db2025.DB2025Team05_poppop.DB2025Team05_domain.User;
@@ -99,14 +100,15 @@ public class SignupProducerController{
             userService.registerUser(user, companyInfo);
 
             messageLabel.setStyle("-fx-text-fill: green;");
-            messageLabel.setText("회원가입 완료! 팝업 등록 화면으로 이동합니다.");
+            messageLabel.setText("회원가입 완료! 로그인 화면으로 이동합니다.");
+
 
             // 화면 전환
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/popup_register.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/login.fxml"));
             Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("팝업스토어 등록");
+            stage.setTitle("로그인");
             stage.show();
 
         } catch (Exception e) {

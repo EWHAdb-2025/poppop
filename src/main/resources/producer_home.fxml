@@ -8,7 +8,7 @@
     <Label style="-fx-font-size: 24px; -fx-text-fill: #333;" text="프로듀서 홈" />
 
     <Button fx:id="registerPopupBtn" onAction="#handleRegisterPopup" prefWidth="200" text="팝업스토어 등록" />
-    <Button fx:id="myPopBtn" onAction="handleViewMyPopup" prefWidth="200" text="내 팝업 보기" />
+    <Button fx:id="myPopBtn" onAction="#handleViewMyPopup" prefWidth="200" text="내 팝업 보기" />
     <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="이전" />
 
 </VBox>

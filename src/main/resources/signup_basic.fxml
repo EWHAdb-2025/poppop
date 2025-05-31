@@ -9,23 +9,18 @@
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.SignupBasicController">
 
-
     <children>
-
 
         <Label text="POPCYCLE 회원가입" style="-fx-font-size: 20px;" />
 
-
         <TextField fx:id="emailField" promptText="이메일(ID)" />
-        <TextField fx:id="nameField"  promptText="이름"       />
-
+        <TextField fx:id="nameField"  promptText="이름" />
 
         <Label text="ROLE을 선택해주세요">
             <font>
                 <Font size="14.0" />
             </font>
         </Label>
-
 
         <HBox alignment="CENTER" spacing="10">
             <children>
@@ -41,13 +36,15 @@
             </children>
         </HBox>
 
-
         <HBox alignment="CENTER" spacing="10">
             <children>
                 <Button fx:id="backButton" text="이전" onAction="#handleBack"/>
                 <Button fx:id="nextButton" text="다음" onAction="#handleNext"/>
             </children>
         </HBox>
+
+        <!-- ✅ 메시지 표시용 라벨 추가 -->
+        <Label fx:id="messageLabel" text="" />
 
     </children>
 

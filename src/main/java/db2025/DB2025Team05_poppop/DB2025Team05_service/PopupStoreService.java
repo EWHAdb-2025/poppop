@@ -108,8 +108,7 @@ public class PopupStoreService {
     public boolean updatePopupStore(PopupManagement popup, int userId) {
         try {
             validateProducerPermission(userId);
-            Map<String, Object> existingPopup = findExistingPopup(popup.getPopupId());
-            validatePopupOwnership(existingPopup, userId);
+//            validatePopupOwnership(popup, userId);
             validatePopupInput(popup);
 
             if (!popupRepository.updatePopup(popup)) {
@@ -131,19 +130,18 @@ public class PopupStoreService {
      * 3. 소유권 확인
      * 4. 팝업스토어 삭제
      * 
-     * @param popupId 삭제할 팝업스토어 ID
+     * @param popup 삭제할 팝업스토어 ID
      * @param userId 삭제를 시도하는 사용자 ID
      * @return 삭제 성공 여부
      * @throws BusinessException 권한 없음, 팝업스토어 없음, 소유권 없음, 삭제 실패 시 발생
      */
     @Transactional
-    public boolean deletePopupStore(int popupId, int userId) {
+    public boolean deletePopupStore(PopupManagement popup, int userId) {
         try {
             validateProducerPermission(userId);
-            Map<String, Object> existingPopup = findExistingPopup(popupId);
-            validatePopupOwnership(existingPopup, userId);
+//            validatePopupOwnership(popup, userId);
 
-            if (!popupRepository.deletePopup(popupId)) {
+            if (!popupRepository.deletePopup(popup)) {
                 throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "팝업스토어 삭제에 실패했습니다.");
             }
 
@@ -219,16 +217,16 @@ public class PopupStoreService {
             .orElseThrow(() -> new BusinessException(ErrorCode.POPUP_NOT_FOUND));
     }
 
-    /**
-     * 팝업스토어 소유권 확인
-     * 
-     * @param popup 확인할 팝업스토어 정보
-     * @param userId 확인할 사용자 ID
-     * @throws BusinessException 소유권이 없는 경우
-     */
-    private void validatePopupOwnership(Map<String, Object> popup, int userId) {
-        if ((Integer)popup.get("userId") != userId) {
-            throw new BusinessException(ErrorCode.INVALID_ROLE, "다른 사용자의 팝업스토어는 수정할 수 없습니다.");
-        }
-    }
+//    /**
+//     * 팝업스토어 소유권 확인
+//     *
+//     * @param popup 확인할 팝업스토어 정보
+//     * @param userId 확인할 사용자 ID
+//     * @throws BusinessException 소유권이 없는 경우
+//     */
+//    private void validatePopupOwnership(PopupManagement popup, int userId) {
+//        if ((popupRepository.findPopupByUserId(userId)!= popup)) {
+//            throw new BusinessException(ErrorCode.INVALID_ROLE, "다른 사용자의 팝업스토어는 수정할 수 없습니다.");
+//        }
+//    }
 } 

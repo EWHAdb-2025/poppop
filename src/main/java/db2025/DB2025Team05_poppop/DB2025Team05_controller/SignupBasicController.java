@@ -1,5 +1,6 @@
 package db2025.DB2025Team05_poppop.DB2025Team05_controller;
 
+import db2025.DB2025Team05_poppop.DB2025Team05_common.AppSession;
 import db2025.DB2025Team05_poppop.DB2025Team05_common.Role;
 import db2025.DB2025Team05_poppop.DB2025Team05_domain.User;
 import db2025.DB2025Team05_poppop.DB2025Team05_repository.CompanyRepository;
@@ -94,7 +95,15 @@ public class SignupBasicController extends BaseController {
                 userService.registerUser(user, null);  // 회사 정보 없음
 
                 messageLabel.setStyle("-fx-text-fill: green;");
-                messageLabel.setText("회원가입 완료!");
+                messageLabel.setText("회원가입 완료! 로그인 화면으로 넘어갑니다.");
+
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/login.fxml"));
+                Parent root = loader.load();
+
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setTitle("로그인");
+                stage.show();
 
             } catch (Exception e) {
                 e.printStackTrace();
