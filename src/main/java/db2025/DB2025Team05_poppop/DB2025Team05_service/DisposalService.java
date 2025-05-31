@@ -41,6 +41,15 @@ public class DisposalService {
     private final PopupRepository popupRepository;
     private final WasteRepository wasteRepository;
 
+    public List<User> getAllProcessors() {
+        return userRepository.findAllProcessors(); // Role이 PROCESSOR인 사용자만 반환
+    }
+
+    public List<PopupManagement> getAllPopupStores() {
+        return popupRepository.findAllPopupStores(); // 모든 팝업스토어 목록 반환
+    }
+
+
     /**
      * 시스템에서 사용되는 상수값들을 관리하는 내부 클래스
      * 
@@ -93,13 +102,13 @@ public class DisposalService {
             validateDisposalInput(record);
 
             // 1. Waste 먼저 저장하고 생성된 ID를 받아옴
-            Integer generatedWasteId = wasteRepository.insertWaste(waste);
+            Waste generatedWasteId = wasteRepository.insertWaste(waste);
             if (generatedWasteId == null) {
                 throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "폐기물 정보 등록에 실패했습니다.");
             }
 
             // 2. DisposalRecord에 wasteId 설정
-            record.setWasteId(generatedWasteId);
+            record.setWasteId(generatedWasteId.getId());
 
             // 3. DisposalRecord 저장
             boolean disposalSuccess = dispRecRepository.insertDisposalRecord(record);
@@ -217,7 +226,7 @@ public class DisposalService {
     public Optional<List<Map<String, Object>>> getDisposalStatisticsByMonth(int managerId, int year, int month) {
         try {
             validateManagerPermission(managerId);
-            return dispRecRepository.getDisposalStatisticsByPopup(year, month);
+            return dispRecRepository.getDisposalStatisticsByMonth(year, month);
         } catch (SQLException e) {
             throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다: " + e.getMessage());
         }

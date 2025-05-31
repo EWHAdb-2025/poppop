@@ -127,8 +127,8 @@ public class DispRecRepository {
 
         sql.setLength(sql.length() - 2);
         sql.append(" WHERE id = ?");
-        params.add(dr.getId());
-    
+        params.add(dr.getDisposalId());
+
         try (PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) {
                 pstmt.setObject(i + 1, params.get(i));
@@ -159,7 +159,7 @@ public class DispRecRepository {
                 record.put("status", rs.getString("status"));
 
                 Timestamp ts = rs.getTimestamp("disposal_date");
-                result.put("disposalDate", ts != null ? ts.toLocalDateTime() : null);
+                record.put("disposalDate", ts != null ? ts.toLocalDateTime() : null);
 
                 results.add(record);
             }
@@ -185,7 +185,7 @@ public class DispRecRepository {
                 record.put("status", rs.getString("status"));
 
                 Timestamp ts = rs.getTimestamp("disposal_date");
-                result.put("disposalDate", ts != null ? ts.toLocalDateTime() : null);
+                record.put("disposalDate", ts != null ? ts.toLocalDateTime() : null);
 
                 results.add(record);
             }

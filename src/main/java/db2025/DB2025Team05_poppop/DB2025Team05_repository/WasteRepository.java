@@ -15,7 +15,7 @@ public class WasteRepository {
     }
 
     // insert
-    public Waste insertUser(Waste waste) throws SQLException {
+    public Waste insertWaste(Waste waste) throws SQLException {
         String sql = "insert into Waste(amount, type) values (?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, waste.getAmount());
@@ -29,7 +29,7 @@ public class WasteRepository {
             try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     waste.setId(generatedKeys.getInt(1));
-                    return user;
+                    return waste;
                 } else {
                     return null;
                 }
