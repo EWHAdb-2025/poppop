@@ -13,8 +13,8 @@
     <children>
         <Label style="-fx-font-size: 20px;" text="POPCYCLE 회원가입" />
         
-        <TextField fx:id="emailField" promptText="�̸���" text="email(ID)" />
-        <TextField fx:id="nameField" promptText="�̸�" text="이름" />
+        <TextField fx:id="emailField" promptText="이메일" text="email(ID)" />
+        <TextField fx:id="nameField" promptText="이름" text="이름" />
         
         <Label text="ROLE 을 선택해주세요 ">
          <font>

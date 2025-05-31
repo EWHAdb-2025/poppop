@@ -17,7 +17,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.stage.Stage;
 
-import java.SignupProducerController;
+import java.sql.SQLException;
 
 public class SignupBasicController extends BaseController {
 
@@ -27,6 +27,14 @@ public class SignupBasicController extends BaseController {
     @FXML private ToggleButton managerButton;
     @FXML private Button nextButton;
     @FXML private Label messageLabel;
+
+    private final UserService userService = new UserService(
+            new UserRepository(),
+            new CompanyRepository()
+    );
+
+    public SignupBasicController() throws SQLException {
+    }
 
     @FXML
     private void handleNext(ActionEvent event) {
@@ -53,10 +61,6 @@ public class SignupBasicController extends BaseController {
                 user.setEmail(email);
                 user.setName(name);
                 user.setRole(role);
-
-                UserRepository userRepository = new UserRepository();
-                CompanyRepository companyRepository = new CompanyRepository();
-                UserService userService = new UserService(userRepository, companyRepository);
 
                 userService.registerUser(user, null);  // 회사 정보 없음
 
@@ -89,6 +93,7 @@ public class SignupBasicController extends BaseController {
             }
         }
     }
+
 }
 
 

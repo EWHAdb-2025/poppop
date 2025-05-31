@@ -91,7 +91,7 @@ public class CompanyRepository {
         }
         if(comp.getRepresentativePhone() !=null){
             sql.append("representative_phone = ?, ");
-            params.add(comp.getRepresentativePhone())
+            params.add(comp.getRepresentativePhone());
         }
         if (params.isEmpty()) {
             System.out.println("수정할 필드가 없습니다.");

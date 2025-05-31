@@ -16,6 +16,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+import java.sql.SQLException;
+
 public class SignupProducerController extends BaseController {
 
     @FXML private TextField companyNameField;
@@ -28,11 +30,19 @@ public class SignupProducerController extends BaseController {
     private String name;
     private Role role;
 
+    public SignupProducerController() throws SQLException {
+    }
+
     public void setBasicInfo(String email, String name, String roleStr) {
         this.email = email;
         this.name = name;
         this.role = Role.valueOf(roleStr.toUpperCase());
     }
+
+    private final UserService userService = new UserService(
+            new UserRepository(),
+            new CompanyRepository()
+    );
 
     @FXML
     private void handleRegister(ActionEvent event) {
@@ -59,10 +69,6 @@ public class SignupProducerController extends BaseController {
             companyInfo.setBusinessNumber(businessNumber);
             companyInfo.setRepresentativeName(ceoName);
             companyInfo.setRepresentativePhone(ceoPhone);
-
-            UserRepository userRepository = new UserRepository();
-            CompanyRepository companyRepository = new CompanyRepository();
-            UserService userService = new UserService(userRepository, companyRepository);
 
             userService.registerUser(user, companyInfo);
 
