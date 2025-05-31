@@ -13,7 +13,7 @@ import javafx.scene.control.TextField;
 
 import java.time.LocalDate;
 
-public class PopupRegisterController {
+public class PopupRegisterController extends BaseController{
 
     @FXML private TextField emailField;  // (UI 표시용, 실제 저장은 userId)
     @FXML private TextField popupnameField;

@@ -11,7 +11,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
-public class ProcessorRegisterController {
+public class ProcessorRegisterController extends BaseController {
 
     @FXML private TextField bizNumberField;
     @FXML private TextField companyNameField;
