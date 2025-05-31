@@ -172,7 +172,7 @@ public class DispRecRepository {
 
     // DB2025_DISPOSAL_VIEW 이용해 회사별 폐기물 처리 정보 조회
     public Optional<List<Map<String, Object>>> getDisposalStatisticsByCompanyname(String companyName) {
-        String sql = "select popup_name, type, amount, status, disposal date from DB2025_DISPOSAL_VIEW where company_name = ?";
+        String sql = "select popup_name, type, amount, status, disposal_date from DB2025_DISPOSAL_VIEW where company_name = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, companyName);
             ResultSet rs = pstmt.executeQuery();

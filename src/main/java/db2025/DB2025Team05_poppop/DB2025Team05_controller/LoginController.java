@@ -57,7 +57,7 @@ public class LoginController {
             AppSession.login(user);
 
             // 화면 전환
-            String fxml = (selectedRole == Role.PRODUCER) ? "/popup_register.fxml" : "/manager_home.fxml";
+            String fxml = (selectedRole == Role.PRODUCER) ? "/producer_home.fxml" : "/manager_home.fxml";
             Parent root = FXMLLoader.load(getClass().getResource(fxml));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));

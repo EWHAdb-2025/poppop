@@ -18,13 +18,6 @@ import javafx.stage.Stage;
  */
 public class ProducerHomeController {
 
-    /* 필요한 경우 로그인 시점에서 주입 */
-    private int producerId;
-
-    public void setProducerId(int id) {
-        this.producerId = id;
-    }
-
     /** ① 팝업스토어 등록 화면으로 */
     @FXML
     private void handleRegisterPopup(ActionEvent event) {

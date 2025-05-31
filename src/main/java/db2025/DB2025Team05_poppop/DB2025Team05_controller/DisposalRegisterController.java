@@ -11,10 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
@@ -27,7 +24,7 @@ public class DisposalRegisterController extends BaseController {
     @FXML
     private ComboBox<String> popupComboBox;
     @FXML
-    private ComboBox<String> companyComboBox;
+    private ComboBox<String> processorComboBox;
     @FXML
     private DatePicker disposalDate;
     @FXML
@@ -36,7 +33,10 @@ public class DisposalRegisterController extends BaseController {
     private Label messageLabel;
     @FXML
     private Button backButton;
-
+    @FXML
+    private TextField wasteTypeField;
+    @FXML
+    private TextField amountField;
 
     private final DisposalService disposalService = new DisposalService(
             new DispRecRepository(),
@@ -75,7 +75,7 @@ public class DisposalRegisterController extends BaseController {
             } else {
                 System.out.println("[Init] No processor companies found");
             }
-            companyComboBox.setItems(FXCollections.observableArrayList(processorNames));
+            processorComboBox.setItems(FXCollections.observableArrayList(processorNames));
 
             List<String> popupNames = new ArrayList<>();
             if (popups.isPresent()) {
@@ -127,7 +127,7 @@ public class DisposalRegisterController extends BaseController {
     private void handleRegister(ActionEvent event) {
         System.out.println("[Register Start]");
         String selectedPopupName = popupComboBox.getValue();
-        String selectedProcessCompanyName = companyComboBox.getValue();
+        String selectedProcessCompanyName = processorComboBox.getValue();
         LocalDate date = disposalDate.getValue();
         String status = statusComboBox.getValue();
 
@@ -151,8 +151,8 @@ public class DisposalRegisterController extends BaseController {
             System.out.println("[Register] Retrieved companyId: " + companyId + ", popupId: " + popupId + ", userId: " + userId);
 
             Waste waste = new Waste();
-            waste.setAmount(1);
-            waste.setType("Basic Waste");
+            waste.setAmount(Integer.parseInt(amountField.getText())); // 숫자 변환 필요
+            waste.setType(wasteTypeField.getText());
 
 
             DisposalRecord record = new DisposalRecord();
@@ -160,7 +160,6 @@ public class DisposalRegisterController extends BaseController {
             record.setPopupId(popupId);
             record.setDisposalDate(date.atStartOfDay());
             record.setStatus(status);
-            record.setWasteId(1); // Handled in validateDisposalInput
 
             System.out.println("[Register] Record created, ready to register");
 
