@@ -145,4 +145,7 @@ public class UserRepository {
         user.setEmail(rs.getString("email"));
         return user;
     }
+    //TODO
+//    public List<User> findAllProcessors() {
+//    }
 }

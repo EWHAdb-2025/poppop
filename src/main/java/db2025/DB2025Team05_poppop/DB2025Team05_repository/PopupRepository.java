@@ -164,6 +164,8 @@ public class PopupRepository {
         }
     }
 
-
+//TODO
+//    public List<PopupManagement> findAllPopupStores() {
+//    }
 }
 
