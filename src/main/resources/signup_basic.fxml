@@ -1,33 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<VBox alignment="CENTER" prefHeight="400" prefWidth="400" spacing="12" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.SignupBasicController">
-    
+<VBox alignment="CENTER" prefHeight="400" prefWidth="400" spacing="12"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.SignupBasicController">
+
+
     <children>
-        <Label style="-fx-font-size: 20px;" text="POPCYCLE 회원가입" />
-        
-        <TextField fx:id="emailField" promptText="이메일" text="email(ID)" />
-        <TextField fx:id="nameField" promptText="이름" text="이름" />
-        
-        <Label text="ROLE 을 선택해주세요 ">
-         <font>
-            <Font size="14.0" />
-         </font></Label>
+
+
+        <Label text="POPCYCLE 회원가입" style="-fx-font-size: 20px;" />
+
+
+        <TextField fx:id="emailField" promptText="이메일(ID)" />
+        <TextField fx:id="nameField"  promptText="이름"       />
+
+
+        <Label text="ROLE을 선택해주세요">
+            <font>
+                <Font size="14.0" />
+            </font>
+        </Label>
+
+
         <HBox alignment="CENTER" spacing="10">
             <children>
-                <ToggleButton fx:id="producerButton" text="producer" />
-                <ToggleButton fx:id="managerButton" text="manager" />
+                <!-- ToggleGroup 정의 -->
+                <fx:define>
+                    <ToggleGroup fx:id="roleGroup"/>
+                </fx:define>
+
+                <ToggleButton fx:id="producerButton" text="producer"
+                              toggleGroup="$roleGroup" />
+                <ToggleButton fx:id="managerButton"  text="manager"
+                              toggleGroup="$roleGroup" />
             </children>
         </HBox>
-        
-        <Button fx:id="nextButton" onAction="#handleNext" text="다음" />
-        <Label fx:id="messageLabel" style="-fx-text-fill: red;" text="" />
+
+
+        <HBox alignment="CENTER" spacing="10">
+            <children>
+                <Button fx:id="backButton" text="이전" onAction="#handleBack"/>
+                <Button fx:id="nextButton" text="다음" onAction="#handleNext"/>
+            </children>
+        </HBox>
+
     </children>
+
 </VBox>

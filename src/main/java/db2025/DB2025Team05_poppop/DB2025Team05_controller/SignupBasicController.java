@@ -27,11 +27,40 @@ public class SignupBasicController extends BaseController {
     @FXML private ToggleButton managerButton;
     @FXML private Button nextButton;
     @FXML private Label messageLabel;
+    @FXML private Button backButton;
 
     private final UserService userService = new UserService(
             new UserRepository(),
             new CompanyRepository()
     );
+
+    @FXML
+    public void initialize() {
+        super.initialize();
+    }
+
+    @FXML
+    private void handleBack(ActionEvent event) {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/manager_home.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Manager 홈");
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            setError("이전 화면으로 돌아가는 데 실패했습니다.");
+        }
+    }
+
+    private void setError(String msg) {
+        messageLabel.setStyle("-fx-text-fill: red;");
+        messageLabel.setText(msg);
+    }
+    private void setSuccess(String msg) {
+        messageLabel.setStyle("-fx-text-fill: green;");
+        messageLabel.setText(msg);
+    }
 
     public SignupBasicController() throws SQLException {
     }

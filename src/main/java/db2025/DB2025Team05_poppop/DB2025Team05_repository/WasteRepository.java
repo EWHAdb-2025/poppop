@@ -16,8 +16,8 @@ public class WasteRepository {
 
     // insert
     public Waste insertWaste(Waste waste) throws SQLException {
-        String sql = "insert into Waste(amount, type) values (?, ?)";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        String sql = "insert into DB2025_WASTE(amount, type) values (?, ?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setInt(1, waste.getAmount());
             pstmt.setString(2, waste.getType());
             
@@ -39,7 +39,7 @@ public class WasteRepository {
 
     // search
     public Optional<Waste> findByWasteId(int id) {
-        String sql = "select * from Waste where id = ?";
+        String sql = "select * from DB2025_WASTE where id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -76,7 +76,7 @@ public class WasteRepository {
 
     // delete
     public boolean deleteWaste(int id) {
-        String sql = "delete from Waste where id = ?";
+        String sql = "delete from DB2025_WASTE where id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             int rowsDeleted = pstmt.executeUpdate();
