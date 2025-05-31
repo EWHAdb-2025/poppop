@@ -68,10 +68,10 @@ public class MyPopupListController extends BaseController {
     @FXML
     private void handleBack(ActionEvent event) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/manager_home.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/producer_home.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("Manager 홈");
+            stage.setTitle("Producer 홈");
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();

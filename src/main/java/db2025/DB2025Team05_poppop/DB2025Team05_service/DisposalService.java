@@ -135,7 +135,6 @@ public class DisposalService {
             validateManagerPermission(managerId);
             validateProcessorExists(record.getUserId());
             validatePopupExists(record.getPopupId());
-            validateDisposalInput(record);
 
             // 1. 폐기물 정보 수정 먼저
             boolean wasteUpdated = wasteRepository.updateWaste(waste);
@@ -286,21 +285,18 @@ public class DisposalService {
 
     /**
      * 폐기물 처리 기록 입력값 검증
-     * 
+     *
      * 검증 항목:
      * 1. null 체크
      * 2. 폐기물량 범위 (1kg ~ 1000kg)
      * 3. 처리일자 유효성
-     * 
+     *
      * @param record 검증할 처리 기록
      * @throws BusinessException 검증 실패 시
      */
     private void validateDisposalInput(DisposalRecord record) {
         if (record == null) {
             throw new BusinessException(ErrorCode.INVALID_INPUT, "처리 기록 정보가 없습니다.");
-        }
-        if (record.getWasteId() == 0) {
-            throw new BusinessException(ErrorCode.INVALID_INPUT, "폐기물 정보가 없습니다.");
         }
         if (record.getDisposalDate() == null) {
             throw new BusinessException(ErrorCode.INVALID_INPUT, "처리일자를 입력해주세요.");

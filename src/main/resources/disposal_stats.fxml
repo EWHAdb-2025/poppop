@@ -13,11 +13,18 @@
 
         <HBox alignment="CENTER" spacing="10">
             <children>
-                <Button fx:id="companyStatsBtn" onAction="#handleCompanyStats" text="회사별 통계" />
-                <Button fx:id="popupStatsBtn" onAction="#handlePopupStats" text="팝업별 통계" />
-                <Button fx:id="monthStatsBtn" onAction="#handleMonthStats" text="월별 통계" />
+                <TextField fx:id="companySearchField" promptText="회사명 입력" />
+                <Button onAction="#handleCompanySearch" text="검색" />
             </children>
         </HBox>
+
+        <HBox alignment="CENTER" spacing="10">
+            <children>
+                <TextField fx:id="popupSearchField" promptText="팝업스토어명 입력" />
+                <Button onAction="#handlePopupSearch" text="검색" />
+            </children>
+        </HBox>
+
         <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="이전" />
 
 

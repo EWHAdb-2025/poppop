@@ -42,10 +42,10 @@ public class SignupBasicController extends BaseController {
     @FXML
     private void handleBack(ActionEvent event) {
         try {
-            Parent root = FXMLLoader.load(getClass().getResource("/manager_home.fxml"));
+            Parent root = FXMLLoader.load(getClass().getResource("/login.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(root));
-            stage.setTitle("Manager 홈");
+            stage.setTitle("로그인");
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();

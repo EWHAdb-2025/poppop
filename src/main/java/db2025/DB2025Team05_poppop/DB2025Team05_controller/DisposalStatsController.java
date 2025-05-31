@@ -3,6 +3,7 @@ package db2025.DB2025Team05_poppop.DB2025Team05_controller;
 import db2025.DB2025Team05_poppop.DB2025Team05_exception.BusinessException;
 import db2025.DB2025Team05_poppop.DB2025Team05_repository.*;
 import db2025.DB2025Team05_poppop.DB2025Team05_service.DisposalService;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -28,15 +29,17 @@ public class DisposalStatsController extends BaseController {
     @FXML
     private Button backButton;
     @FXML private Label messageLabel;
+    @FXML private TextField companySearchField;
+    @FXML private TextField popupSearchField;
 
-    private DisposalService service;
+    private DisposalService disposalService;
 
 
     @FXML
     public void initialize() {
         super.initialize();
         try {
-            service = new DisposalService(
+            disposalService = new DisposalService(
                     new DispRecRepository(),
                     new UserRepository(),
                     new PopupRepository(),
@@ -73,9 +76,9 @@ public class DisposalStatsController extends BaseController {
     }
 
     @FXML
-    private void handleCompanyStats() {
+    private void handleCompanySearch() {
         try {
-            Optional<List<Map<String, Object>>> resultOpt = service.getDisposalStatisticsByCompanyname(currentUser.getId(), "");
+            Optional<List<Map<String, Object>>> resultOpt = disposalService.getDisposalStatisticsByCompanyname(currentUser.getId(), companySearchField.getText());
             resultOpt.ifPresent(result -> updateTable("회사명", "companyName", result));
         } catch (BusinessException e) {
             showAlert(e.getMessage());
@@ -83,24 +86,11 @@ public class DisposalStatsController extends BaseController {
     }
 
     @FXML
-    private void handlePopupStats() {
+    private void handlePopupSearch() {
         try {
             Optional<List<Map<String, Object>>> resultOpt =
-                    service.getDisposalStatisticsByPopup(currentUser.getId(), "");  // 빈 문자열로 전체 조회
+                    disposalService.getDisposalStatisticsByPopup(currentUser.getId(), popupSearchField.getText());  // 빈 문자열로 전체 조회
             resultOpt.ifPresent(result -> updateTable("팝업 ID", "popupId", result));
-        } catch (BusinessException e) {
-            showAlert(e.getMessage());
-        }
-    }
-
-    @FXML
-    private void handleMonthStats() {
-        try {
-            int year = LocalDate.now().getYear();
-            int month = LocalDate.now().getMonthValue();
-            Optional<List<Map<String, Object>>> resultOpt =
-                    service.getDisposalStatisticsByMonth(currentUser.getId(), year, month);  // 연도, 월 전달
-            resultOpt.ifPresent(result -> updateTable("월", "month", result));
         } catch (BusinessException e) {
             showAlert(e.getMessage());
         }
@@ -116,10 +106,10 @@ public class DisposalStatsController extends BaseController {
             return new javafx.beans.property.SimpleStringProperty(String.valueOf(value));
         });
 
-        TableColumn<Map<String, Object>, String> col2 = new TableColumn<>("총 처리 건수");
+        TableColumn<Map<String, Object>, String> col2 = new TableColumn<>("처리량 (kg)");
         col2.setCellValueFactory(param -> {
-            Object value = param.getValue().get("totalDisposal");
-            return new javafx.beans.property.SimpleStringProperty(String.valueOf(value));
+            Object value = param.getValue().get("amount"); // key must exist in Map
+            return new SimpleStringProperty(String.valueOf(value));
         });
 
         statsTableView.getColumns().addAll(col1, col2);
