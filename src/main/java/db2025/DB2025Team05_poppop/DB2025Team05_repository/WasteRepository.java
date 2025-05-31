@@ -15,22 +15,25 @@ public class WasteRepository {
     }
 
     // insert
-    public Integer insertWaste(Waste waste) {
-        String sql = "insert into Waste(id, amount, type) values (?, ?, ?)";
+    public Waste insertUser(Waste waste) throws SQLException {
+        String sql = "insert into Waste(amount, type) values (?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, waste.getId());
-            if (waste.getAmount() != null) {
-                pstmt.setInt(2, waste.getAmount());
-            } else {
-                pstmt.setNull(2, Types.INTEGER);
+            pstmt.setInt(1, waste.getAmount());
+            pstmt.setString(2, waste.getType());
+            
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                return null;
             }
-            pstmt.setString(3, waste.getType());
-            pstmt.executeUpdate();
-            return waste.getId();
-        } catch (SQLException e) {
-            System.out.println("폐기물 삽입 오류: " + e.getMessage());
-            e.printStackTrace();
-            return 0;
+
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    waste.setId(generatedKeys.getInt(1));
+                    return user;
+                } else {
+                    return null;
+                }
+            }
         }
     }
 

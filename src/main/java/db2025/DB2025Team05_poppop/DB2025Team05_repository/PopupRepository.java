@@ -91,8 +91,7 @@ public class PopupRepository {
 
     // search by producer email
     public Optional<List<Map<String, Object>>> findPopupsByProducerEmail(String email) {
-        String sql = "select pm.* FROM DB2025_POPUP_MANAGEMENT pm 
-                    join DB2025_USER u on pm.user_id = u.user_id where u.email = ?";
+        String sql = "select pm.* FROM DB2025_POPUP_MANAGEMENT pm join DB2025_USER u on pm.user_id = u.user_id where u.email = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);
             ResultSet rs = pstmt.executeQuery();
@@ -128,7 +127,7 @@ public class PopupRepository {
         List<Object> params = new ArrayList<>();
 
         if(popup.getName() != null){
-            sql.append("name = ?, ")
+            sql.append("name = ?, ");
         }
         if (popup.getAddress() != null && !popup.getAddress().isBlank()) {
             sql.append("address = ?, ");
