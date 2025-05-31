@@ -2,23 +2,15 @@ package db2025.DB2025Team05_poppop.DB2025Team05_service;
 
 import db2025.DB2025Team05_poppop.DB2025Team05_common.ErrorCode;
 import db2025.DB2025Team05_poppop.DB2025Team05_common.Role;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DisposalRecord;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.PopupManagement;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.User;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.Waste;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.*;
 import db2025.DB2025Team05_poppop.DB2025Team05_exception.BusinessException;
-import db2025.DB2025Team05_poppop.DB2025Team05_repository.DispRecRepository;
-import db2025.DB2025Team05_poppop.DB2025Team05_repository.PopupRepository;
-import db2025.DB2025Team05_poppop.DB2025Team05_repository.UserRepository;
-import db2025.DB2025Team05_poppop.DB2025Team05_repository.WasteRepository;
+import db2025.DB2025Team05_poppop.DB2025Team05_repository.*;
 import org.antlr.v4.runtime.atn.SemanticContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * 폐기물 처리 기록 관련 비즈니스 로직을 처리하는 서비스 클래스
@@ -40,12 +32,22 @@ public class DisposalService {
     private final UserRepository userRepository;
     private final PopupRepository popupRepository;
     private final WasteRepository wasteRepository;
+    private final CompanyRepository companyRepository;
 
-    public List<User> getAllProcessors() {
-        return userRepository.findAllProcessors(); // Role이 PROCESSOR인 사용자만 반환
+    public DisposalService(DispRecRepository dispRecRepository, UserRepository userRepository, PopupRepository popupRepository, WasteRepository wasteRepository, CompanyRepository companyRepository) {
+        this.dispRecRepository = dispRecRepository;
+        this.userRepository = userRepository;
+        this.popupRepository = popupRepository;
+        this.wasteRepository = wasteRepository;
+        this.companyRepository = companyRepository;
     }
 
-    public List<PopupManagement> getAllPopupStores() {
+    public Optional<List<CompanyInfo>> getAllProcessCompanies() {
+        return companyRepository.findAllProcessorCompanies();
+    }
+
+
+    public Optional<List<PopupManagement>> getAllPopupStores() {
         return popupRepository.findAllPopupStores(); // 모든 팝업스토어 목록 반환
     }
 
@@ -62,19 +64,8 @@ public class DisposalService {
         private static final int MAX_WASTE_AMOUNT = 1000;
     }
 
-    /**
-     * DisposalService 생성자
-     * 
-     * @param dispRecRepository 폐기물 처리 기록을 관리하는 저장소
-     * @param userRepository 사용자 정보를 관리하는 저장소
-     * @param popupRepository 팝업스토어 정보를 관리하는 저장소
-     */
-    public DisposalService(DispRecRepository dispRecRepository, UserRepository userRepository, PopupRepository popupRepository, WasteRepository wasteRepository) {
-        this.dispRecRepository = dispRecRepository;
-        this.userRepository = userRepository;
-        this.popupRepository = popupRepository;
-        this.wasteRepository = wasteRepository;
-    }
+
+
 
     /**
      * 폐기물 처리 기록 등록

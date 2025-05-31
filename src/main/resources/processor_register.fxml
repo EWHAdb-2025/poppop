@@ -10,11 +10,11 @@
     <children>
         <Label style="-fx-font-size: 20px;" text="폐기물 처리 업체 등록" />
 
-        <TextField fx:id="bizNumberField" promptText="����� ��ȣ" text="사업자등록번호" />
-        <TextField fx:id="companyNameField" promptText="��ȣ��" text="상호명" />
-        <TextField fx:id="ceoNameField" promptText="��ǥ�ڸ�" text="대표자 이름" />
-        <TextField fx:id="ceoPhoneField" promptText="��ǥ�� ����ó" text="대표자 연락처" />
-        <TextField fx:id="emailField" promptText="���̵� (�̸���)" text="email(ID)" />
+        <TextField fx:id="bizNumberField" promptText="사업자등록번호" />
+        <TextField fx:id="companyNameField" promptText="상호명" />
+        <TextField fx:id="ceoNameField" promptText="대표자명" />
+        <TextField fx:id="ceoPhoneField" promptText="대표자 연락처" />
+        <TextField fx:id="emailField" promptText="이메일 (ID)" />
 
         <Button fx:id="registerButton" onAction="#handleRegister" text="등록" />
         <Label fx:id="messageLabel" style="-fx-text-fill: red;" text="" />

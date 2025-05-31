@@ -15,18 +15,13 @@ import java.time.LocalDate;
 
 public class PopupRegisterController extends BaseController{
 
-    @FXML private TextField emailField;  // (UI 표시용, 실제 저장은 userId)
+//    @FXML private TextField emailField;  // (UI 표시용, 실제 저장은 userId)
     @FXML private TextField popupnameField;
     @FXML private TextField addressField;
     @FXML private DatePicker startDatePicker;
     @FXML private DatePicker endDatePicker;
     @FXML private Label messageLabel;
 
-    private int userId;  // PRODUCER 사용자 ID
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
 
     @FXML
     private void handleRegister(ActionEvent event) {
@@ -66,7 +61,7 @@ public class PopupRegisterController extends BaseController{
                     new PopupRepository(), new UserRepository()
             );
 
-            PopupManagement result = popupService.registerPopupStore(popup, userId);
+            PopupManagement result = popupService.registerPopupStore(popup, currentUser.getId());
 
             messageLabel.setStyle("-fx-text-fill: green;");
             messageLabel.setText("팝업 등록 성공!");

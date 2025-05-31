@@ -1,9 +1,6 @@
 package db2025.DB2025Team05_poppop.DB2025Team05_controller;
 
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.DisposalRecord;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.PopupManagement;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.User;
-import db2025.DB2025Team05_poppop.DB2025Team05_domain.Waste;
+import db2025.DB2025Team05_poppop.DB2025Team05_domain.*;
 import db2025.DB2025Team05_poppop.DB2025Team05_exception.BusinessException;
 import db2025.DB2025Team05_poppop.DB2025Team05_repository.*;
 import db2025.DB2025Team05_poppop.DB2025Team05_service.DisposalService;
@@ -16,25 +13,30 @@ import javafx.scene.control.Label;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class DisposalRegisterController extends BaseController {
 
-    @FXML private ComboBox<User> processorComboBox;
-    @FXML private ComboBox<PopupManagement> popupComboBox;
-    @FXML private DatePicker disposalDatePicker;
+    @FXML private ComboBox<String> popupComboBox;
+    @FXML private ComboBox<String> companyComboBox;
+    @FXML private DatePicker disposalDate;
     @FXML private ComboBox<String> statusComboBox;
     @FXML private Label messageLabel;
 
     private int managerId;
 
-    // 서비스 객체 의존성 주입 (DI) 방식으로 생성
     private final DisposalService disposalService = new DisposalService(
             new DispRecRepository(),
             new UserRepository(),
             new PopupRepository(),
-            new WasteRepository()
+            new WasteRepository(),
+            new CompanyRepository()
     );
+
+    // 이름 → ID 매핑
+    private final Map<String, Integer> processorCompanyNameToId = new HashMap<>();
+    private final Map<String, Integer> popupNameToId = new HashMap<>();
 
     public DisposalRegisterController() throws SQLException {
     }
@@ -46,45 +48,63 @@ public class DisposalRegisterController extends BaseController {
     @FXML
     public void initialize() {
         try {
-            // 처리자 목록 및 팝업스토어 목록 조회
-            List<User> processors = disposalService.getAllProcessors();
-            List<PopupManagement> popups = disposalService.getAllPopupStores();
+            Optional<List<CompanyInfo>> processors = disposalService.getAllProcessCompanies();
+            Optional<List<PopupManagement>> popups = disposalService.getAllPopupStores();
 
-            processorComboBox.setItems(FXCollections.observableArrayList(processors));
-            popupComboBox.setItems(FXCollections.observableArrayList(popups));
+            List<String> processorNames = new ArrayList<>();
+            if (processors.isPresent()) {
+                for (CompanyInfo company : processors.get()) {
+                    processorCompanyNameToId.put(company.getCompanyName(), company.getId());
+                    processorNames.add(company.getCompanyName());
+                }
+            }
+            companyComboBox.setItems(FXCollections.observableArrayList(processorNames));
+
+            List<String> popupNames = new ArrayList<>();
+            if (popups.isPresent()) {
+                for (PopupManagement popup : popups.get()) {
+                    popupNameToId.put(popup.getName(), popup.getPopupId());
+                    popupNames.add(popup.getName());
+                }
+            }
+            popupComboBox.setItems(FXCollections.observableArrayList(popupNames));
+
             statusComboBox.setItems(FXCollections.observableArrayList("완료", "대기", "보류"));
+
         } catch (Exception e) {
             e.printStackTrace();
             messageLabel.setText("초기화 중 오류 발생: " + e.getMessage());
         }
+
     }
 
     @FXML
     private void handleRegister(ActionEvent event) {
-        User selectedProcessor = processorComboBox.getValue();
-        PopupManagement selectedPopup = popupComboBox.getValue();
-        LocalDate date = disposalDatePicker.getValue();
+        String selectedPopupName = popupComboBox.getValue();
+        String selectedProcessCompanyName = companyComboBox.getValue();
+        LocalDate date = disposalDate.getValue();
         String status = statusComboBox.getValue();
 
-        if (selectedProcessor == null || selectedPopup == null || date == null || status == null) {
+        if (selectedProcessCompanyName == null || selectedPopupName == null || date == null || status == null) {
             messageLabel.setStyle("-fx-text-fill: red;");
             messageLabel.setText("모든 항목을 입력해주세요.");
             return;
         }
 
         try {
-            // 기본 Waste 객체 생성
-            Waste waste = new Waste();
-            waste.setAmount(1); // 기본값
-            waste.setType("기본폐기물"); // 기본값
+            Integer userId = processorCompanyNameToId.get(selectedProcessCompanyName);
+            Integer popupId = popupNameToId.get(selectedPopupName);
 
-            // DisposalRecord 생성
+            Waste waste = new Waste();
+            waste.setAmount(1);
+            waste.setType("기본폐기물");
+
             DisposalRecord record = new DisposalRecord();
-            record.setUserId(selectedProcessor.getId());
-            record.setPopupId(selectedPopup.getPopupId());
+            record.setUserId(userId);
+            record.setPopupId(popupId);
             record.setDisposalDate(date.atStartOfDay());
             record.setStatus(status);
-            record.setWasteId(0); // 일단 더미값 (validateDisposalInput에서 확인됨)
+            record.setWasteId(0); // validateDisposalInput에서 처리
 
             disposalService.registerDisposalRecord(record, waste, managerId);
 

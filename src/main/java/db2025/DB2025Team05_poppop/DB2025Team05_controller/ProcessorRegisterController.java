@@ -1,5 +1,6 @@
 package db2025.DB2025Team05_poppop.DB2025Team05_controller;
 
+import db2025.DB2025Team05_poppop.DB2025Team05_common.Role;
 import db2025.DB2025Team05_poppop.DB2025Team05_domain.CompanyInfo;
 import db2025.DB2025Team05_poppop.DB2025Team05_domain.User;
 import db2025.DB2025Team05_poppop.DB2025Team05_exception.BusinessException;
@@ -19,12 +20,6 @@ public class ProcessorRegisterController extends BaseController {
     @FXML private TextField ceoPhoneField;
     @FXML private TextField emailField;
     @FXML private Label messageLabel;
-
-    private int managerId; // 등록을 수행하는 관리자 ID
-
-    public void setManagerId(int id) {
-        this.managerId = id;
-    }
 
     @FXML
     private void handleRegister(ActionEvent event) {
@@ -46,6 +41,7 @@ public class ProcessorRegisterController extends BaseController {
             User user = new User();
             user.setName(ceoName);
             user.setEmail(email);
+            user.setRole(Role.PROCESSOR);
 
             // 처리 업체 회사 정보
             CompanyInfo company = new CompanyInfo();
@@ -59,7 +55,7 @@ public class ProcessorRegisterController extends BaseController {
                     new UserRepository(), new CompanyRepository()
             );
 
-            userService.registerProcessor(managerId, user, company);
+            userService.registerProcessor(currentUser.getId(), user, company);
 
             messageLabel.setStyle("-fx-text-fill: green;");
             messageLabel.setText("처리 업체 등록 성공!");
