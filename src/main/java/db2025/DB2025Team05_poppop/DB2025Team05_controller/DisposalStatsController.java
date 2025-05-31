@@ -29,13 +29,8 @@ public class DisposalStatsController extends BaseController {
     private Button backButton;
     @FXML private Label messageLabel;
 
-    private int managerId;
-
     private DisposalService service;
 
-    public void setManagerId(int id) {
-        this.managerId = id;
-    }
 
     @FXML
     public void initialize() {
@@ -80,7 +75,7 @@ public class DisposalStatsController extends BaseController {
     @FXML
     private void handleCompanyStats() {
         try {
-            Optional<List<Map<String, Object>>> resultOpt = service.getDisposalStatisticsByCompanyname(managerId, "");
+            Optional<List<Map<String, Object>>> resultOpt = service.getDisposalStatisticsByCompanyname(currentUser.getId(), "");
             resultOpt.ifPresent(result -> updateTable("회사명", "companyName", result));
         } catch (BusinessException e) {
             showAlert(e.getMessage());
@@ -91,7 +86,7 @@ public class DisposalStatsController extends BaseController {
     private void handlePopupStats() {
         try {
             Optional<List<Map<String, Object>>> resultOpt =
-                    service.getDisposalStatisticsByPopup(managerId, "");  // 빈 문자열로 전체 조회
+                    service.getDisposalStatisticsByPopup(currentUser.getId(), "");  // 빈 문자열로 전체 조회
             resultOpt.ifPresent(result -> updateTable("팝업 ID", "popupId", result));
         } catch (BusinessException e) {
             showAlert(e.getMessage());
@@ -104,7 +99,7 @@ public class DisposalStatsController extends BaseController {
             int year = LocalDate.now().getYear();
             int month = LocalDate.now().getMonthValue();
             Optional<List<Map<String, Object>>> resultOpt =
-                    service.getDisposalStatisticsByMonth(managerId, year, month);  // 연도, 월 전달
+                    service.getDisposalStatisticsByMonth(currentUser.getId(), year, month);  // 연도, 월 전달
             resultOpt.ifPresent(result -> updateTable("월", "month", result));
         } catch (BusinessException e) {
             showAlert(e.getMessage());

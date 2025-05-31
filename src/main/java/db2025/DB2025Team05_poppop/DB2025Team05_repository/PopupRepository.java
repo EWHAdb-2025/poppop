@@ -25,7 +25,7 @@ public class PopupRepository {
             pstmt.setString(3, popup.getAddress());
             pstmt.setDate(4, java.sql.Date.valueOf(popup.getStartDate()));
             pstmt.setDate(5, java.sql.Date.valueOf(popup.getEndDate()));
-            
+
             int affectedRows = pstmt.executeUpdate();
             if (affectedRows == 0) {
                 return null;
@@ -57,7 +57,7 @@ public class PopupRepository {
                 result.put("representativePhone", rs.getString("representative_phone"));
                 result.put("companyName", rs.getString("company_name"));
                 result.put("companyAddress", rs.getString("company_address"));
-    
+
                 return Optional.of(result);
             }
         } catch (SQLException e) {
@@ -75,11 +75,11 @@ public class PopupRepository {
             List<Map<String, Object>> results = new ArrayList<>();
             while (rs.next()) {
                 Map<String, Object> popup = new HashMap<>();
-                popup.put("popupId", rs.getInt("popup_id"));
-                popup.put("popupName", rs.getString("popup_name"));
-                popup.put("popupAddress", rs.getString("popup_address"));
-                popup.put("startDate", rs.getDate("popup_start_date").toLocalDate());
-                popup.put("endDate", rs.getDate("popup_end_date").toLocalDate());
+                popup.put("popupId", rs.getInt("id"));
+                popup.put("popupName", rs.getString("name"));
+                popup.put("popupAddress", rs.getString("address"));
+                popup.put("startDate", rs.getDate("start_date").toLocalDate());
+                popup.put("endDate", rs.getDate("end_date").toLocalDate());
                 results.add(popup);
             }
             return Optional.of(results);
@@ -89,20 +89,47 @@ public class PopupRepository {
         return Optional.empty();
     }
 
+    // user id로 조회
+    public List<PopupManagement> findPopupByUserId(int userId) {
+        String sql = "select * from DB2025_POPUP_MANAGEMENT where user_id = ?";
+        List<PopupManagement> popups = new ArrayList<>();
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, userId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                PopupManagement popup = new PopupManagement();
+                popup.setPopupId(rs.getInt("id"));
+                popup.setName(rs.getString("name"));
+                popup.setAddress(rs.getString("address"));
+                popup.setStartDate(rs.getDate("start_date").toLocalDate());
+                popup.setEndDate(rs.getDate("end_date").toLocalDate());
+                popup.setUserId(rs.getInt("user_id"));
+                popups.add(popup);
+            }
+            return popups;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
     // search by producer email
     public Optional<List<Map<String, Object>>> findPopupsByProducerEmail(String email) {
-        String sql = "select pm.* FROM DB2025_POPUP_MANAGEMENT pm join DB2025_USER u on pm.user_id = u.user_id where u.email = ?";
+        String sql = "select pm.* FROM DB2025_POPUP_MANAGEMENT pm join DB2025_USER u on pm.user_id = u.id where u.email = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, email);
             ResultSet rs = pstmt.executeQuery();
             List<Map<String, Object>> results = new ArrayList<>();
             while (rs.next()) {
                 Map<String, Object> popup = new HashMap<>();
-                popup.put("popupId", rs.getInt("popup_id"));
-                popup.put("popupName", rs.getString("popup_name"));
-                popup.put("popupAddress", rs.getString("popup_address"));
-                popup.put("startDate", rs.getDate("popup_start_date").toLocalDate());
-                popup.put("endDate", rs.getDate("popup_end_date").toLocalDate());
+                popup.put("popupId", rs.getInt("id"));
+                popup.put("popupName", rs.getString("name"));
+                popup.put("popupAddress", rs.getString("address"));
+                popup.put("startDate", rs.getDate("start_date").toLocalDate());
+                popup.put("endDate", rs.getDate("end_date").toLocalDate());
                 results.add(popup);
             }
             return Optional.of(results);
@@ -111,7 +138,7 @@ public class PopupRepository {
         }
         return Optional.empty();
     }
-    
+
     // delete
     public boolean deletePopup(int id) throws SQLException {
         String sql = "delete DB2025_POPUP_MANAGEMENT WHERE id = ?";
@@ -193,4 +220,3 @@ public class PopupRepository {
 
 
 }
-
