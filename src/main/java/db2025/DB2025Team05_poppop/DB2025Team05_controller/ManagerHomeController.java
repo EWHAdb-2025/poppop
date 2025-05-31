@@ -8,7 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-public class ManagerHomeController {
+public class ManagerHomeController extends BaseController {
 
     private int managerId; // 필요 시 로그인 시점에서 주입
 

@@ -172,39 +172,19 @@ public class DisposalService {
      * @throws BusinessException 권한 없음, 기록 없음, 삭제 실패 시 발생
      */
     @Transactional
-    public DisposalRecord deleteDisposalRecord(int disposalId, int managerId) {
+    public Boolean deleteDisposalRecord(int disposalId, int managerId) {
         try {
             validateManagerPermission(managerId);
 
-            Optional<Map<String, Object>> recordOpt = dispRecRepository.findDisRecByDisRecId(disposalId);
-            if (recordOpt.isEmpty()) {
-                throw new BusinessException(ErrorCode.RECORD_NOT_FOUND, "존재하지 않는 처리 기록입니다.");
-            }
-
-            Map<String, Object> recordData = recordOpt.get();
-            Integer wasteId = (Integer) recordData.get("wasteId");
-
-            // 1. 처리 기록 삭제
-            boolean recordDeleted = dispRecRepository.deleteDisRec(disposalId);
+            // 1. 처리 기록 삭제(연관된 폐기물 정보도 같이 삭제)
+            Boolean recordDeleted = dispRecRepository.deleteDisRec(disposalId);
             if (!recordDeleted) {
                 throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "폐기물 처리 기록 삭제에 실패했습니다.");
             }
-
-            // 2. 연관된 폐기물 정보 삭제
-            boolean wasteDeleted = wasteRepository.deleteWaste(wasteId);
-            if (!wasteDeleted) {
-                throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "연관된 폐기물 정보 삭제에 실패했습니다.");
-            }
+            //TODO 2. 연관된 폐기물 정보 삭제
 
             // 3. 반환
-            return DisposalRecord.builder()
-                    .disposalId(disposalId)
-                    .userId((Integer) recordData.get("userId"))
-                    .popupId((Integer) recordData.get("popupId"))
-                    .status((String) recordData.get("status"))
-                    .disposalDate((java.time.LocalDateTime) recordData.get("disposalDate"))
-                    .wasteId(wasteId)
-                    .build();
+            return recordDeleted;
         } catch (SQLException e) {
             throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "데이터베이스 오류가 발생했습니다: " + e.getMessage());
         }

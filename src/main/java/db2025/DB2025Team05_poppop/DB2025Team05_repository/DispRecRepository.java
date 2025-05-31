@@ -130,7 +130,7 @@ public class DispRecRepository {
     public Optional<List<Map<String, Object>>> getDisposalStatisticsByPopupname(String popupName) {
         String sql = "select popup_name, type, amount, status, disposal_date from DB2025_DISPOSAL_VIEW where popup_name = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, popupName)
+            pstmt.setString(1, popupName);
             ResultSet rs = pstmt.executeQuery();
             List<Map<String, Object>> results = new ArrayList<>();
             while (rs.next()) {
@@ -156,7 +156,7 @@ public class DispRecRepository {
     public Optional<List<Map<String, Object>>> getDisposalStatisticsByCompanyname(String companyName) {
         String sql = "select company_name, popup_name, type, amount, status, disposal date from DB2025_DISPOSAL_VIEW where company_name = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, popupName)
+            pstmt.setString(1, popup_name);
             ResultSet rs = pstmt.executeQuery();
             List<Map<String, Object>> results = new ArrayList<>();
             while (rs.next()) {

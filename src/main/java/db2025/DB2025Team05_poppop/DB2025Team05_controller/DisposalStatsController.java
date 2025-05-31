@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class DisposalStatsController {
+public class DisposalStatsController extends BaseController {
 
     @FXML private TableView<Map<String, Object>> statsTableView;
     @FXML private Button companyStatsBtn;

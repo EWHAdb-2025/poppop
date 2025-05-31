@@ -2,6 +2,8 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.3'
 	id 'io.spring.dependency-management' version '1.1.4'
+	id 'org.openjfx.javafxplugin' version '0.0.13'
+
 }
 
 group = 'db2025'
@@ -12,6 +14,12 @@ java {
 		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
+
+javafx {
+	version = "22"
+	modules = [ 'javafx.controls', 'javafx.fxml']
+}
+
 
 configurations {
 	compileOnly {
