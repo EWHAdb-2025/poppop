@@ -3,38 +3,44 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER"
-      prefHeight="271.0" prefWidth="400" spacing="12"
-      xmlns="http://javafx.com/javafx/17.0.12"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.SignupProducerController">
+<AnchorPane prefWidth="960" prefHeight="540"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.SignupProducerController"
+            stylesheets="@/css/styles.css">
 
     <children>
-        <Label style="-fx-font-size: 20px;" text="PRODUCER 필수 입력사항"/>
+        <VBox alignment="CENTER" spacing="16" layoutX="180" layoutY="80"
+              prefWidth="600" prefHeight="360" styleClass="card">
 
+            <children>
+                <Label text="PRODUCER Essential Input" styleClass="label-title"/>
 
-        <TextField fx:id="bizNumberField"
-                   promptText="사업자등록번호 (10자리)"/>
+                <TextField fx:id="bizNumberField"
+                           promptText="사업자등록번호 (10자리)"
+                           styleClass="input"/>
 
+                <TextField fx:id="companyNameField"
+                           promptText="상호명"
+                           styleClass="input"/>
 
-        <TextField fx:id="companyNameField"
-                   promptText="상호명"/>
+                <TextField fx:id="ceoNameField"
+                           promptText="대표자 이름"
+                           styleClass="input"/>
 
+                <TextField fx:id="ceoPhoneField"
+                           promptText="대표자 연락처"
+                           styleClass="input"/>
 
-        <TextField fx:id="ceoNameField"
-                   promptText="대표자 이름"/>
+                <HBox alignment="CENTER" spacing="14">
+                    <Button fx:id="backButton" text="이전" onAction="#handleBack" styleClass="button-secondary"/>
+                    <Button fx:id="registerButton" text="회원가입" onAction="#handleRegister" styleClass="button-primary"/>
+                </HBox>
 
-
-        <TextField fx:id="ceoPhoneField"
-                   promptText="대표자 연락처"/>
-
-
-        <Button fx:id="registerButton" text="회원가입"
-                onAction="#handleRegister"/>
-        <Button fx:id="backButton" text="이전"
-                onAction="#handleBack"/>
-
-
-        <Label fx:id="messageLabel" style="-fx-text-fill: red;"/>
+                <Label fx:id="messageLabel"
+                       style="-fx-text-fill: red; -fx-font-size: 12px;"
+                       text=""/>
+            </children>
+        </VBox>
     </children>
-</VBox>
+</AnchorPane>

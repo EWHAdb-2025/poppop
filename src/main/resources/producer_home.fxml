@@ -3,12 +3,23 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" prefHeight="300" prefWidth="400" spacing="20" style="-fx-padding: 30;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.ProducerHomeController">
+<AnchorPane prefWidth="960" prefHeight="540"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.ProducerHomeController"
+            stylesheets="@/css/styles.css">
 
-    <Label style="-fx-font-size: 24px; -fx-text-fill: #333;" text="프로듀서 홈" />
+    <children>
+        <VBox alignment="CENTER" spacing="20" layoutX="180" layoutY="100"
+              prefWidth="600" prefHeight="320" styleClass="card">
 
-    <Button fx:id="registerPopupBtn" onAction="#handleRegisterPopup" prefWidth="200" text="팝업스토어 등록" />
-    <Button fx:id="myPopBtn" onAction="#handleViewMyPopup" prefWidth="200" text="내 팝업 보기" />
-    <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="이전" />
+            <children>
+                <Label text="Producer Home" styleClass="label-title" />
 
-</VBox>
+                <Button fx:id="registerPopupBtn" onAction="#handleRegisterPopup" text="팝업스토어 등록" styleClass="button-primary" />
+                <Button fx:id="myPopBtn" onAction="#handleViewMyPopup" text="내 팝업 보기" styleClass="button-primary" />
+                <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="이전" styleClass="button-secondary" />
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>
