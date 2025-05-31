@@ -44,7 +44,7 @@ public class UserService {
      * - MAX_COMPANY_NAME_LENGTH: 회사명 최대 길이 (100자)
      */
     private static final class Constants {
-        private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
+        private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$"); //사업자번호는 10자리
         private static final Pattern BUSINESS_NUMBER_PATTERN = Pattern.compile("^\\d{10}$");
         private static final int MIN_NAME_LENGTH = 2;
         private static final int MAX_NAME_LENGTH = 50;
@@ -125,13 +125,16 @@ public class UserService {
     @Transactional
     public User registerProcessor(int managerId, User user, CompanyInfo companyInfo) {
         try {
+            //1. validate
             validateRole(managerId, Role.MANAGER); //매니저인지 확인
             validateRegistrationInput(user, companyInfo);
             checkEmailDuplicate(user.getEmail());
             checkBusinessNumberDuplicate(companyInfo.getBusinessNumber());
-            
+
+            //2. user에 넣기
             user.setRole(Role.PROCESSOR);
             User savedUser = saveUser(user);
+            //3. 회사에 넣기
             saveCompanyInfo(savedUser.getId(), companyInfo);
             
             return savedUser;

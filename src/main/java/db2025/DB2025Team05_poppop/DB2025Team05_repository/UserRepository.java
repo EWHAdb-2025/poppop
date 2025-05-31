@@ -30,7 +30,7 @@ public class UserRepository {
 
     // insert
     public User insertUser(User user) throws SQLException {
-        String sql = "INSERT INTO DB2025_USER (name, email, role) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO DB2025_USER (name, role, email) VALUES (?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, user.getName());
             pstmt.setString(2, user.getRole().toString());
@@ -145,7 +145,25 @@ public class UserRepository {
         user.setEmail(rs.getString("email"));
         return user;
     }
-    //TODO
-//    public List<User> findAllProcessors() {
-//    }
+
+    public Optional<List<User>> findAllByRole(Role role) {
+        List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM DB2025_USER WHERE role = ?";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, role.toString());
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    users.add(mapResultSetToUser(rs));
+                }
+            }
+            return Optional.of(users); // 빈 리스트라도 감싸서 반환
+        } catch (SQLException e) {
+            System.out.println("역할별 사용자 조회 중 오류 발생: " + e.getMessage());
+        }
+
+        return Optional.empty(); // 예외 발생 시
+    }
+
+
 }

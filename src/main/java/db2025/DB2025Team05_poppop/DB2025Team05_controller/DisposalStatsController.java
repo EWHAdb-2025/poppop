@@ -1,10 +1,7 @@
 package db2025.DB2025Team05_poppop.DB2025Team05_controller;
 
 import db2025.DB2025Team05_poppop.DB2025Team05_exception.BusinessException;
-import db2025.DB2025Team05_poppop.DB2025Team05_repository.DispRecRepository;
-import db2025.DB2025Team05_poppop.DB2025Team05_repository.PopupRepository;
-import db2025.DB2025Team05_poppop.DB2025Team05_repository.UserRepository;
-import db2025.DB2025Team05_poppop.DB2025Team05_repository.WasteRepository;
+import db2025.DB2025Team05_poppop.DB2025Team05_repository.*;
 import db2025.DB2025Team05_poppop.DB2025Team05_service.DisposalService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,7 +38,8 @@ public class DisposalStatsController extends BaseController {
                     new DispRecRepository(),
                     new UserRepository(),
                     new PopupRepository(),
-                    new WasteRepository()
+                    new WasteRepository(),
+                    new CompanyRepository()
             );
         } catch (Exception e) {
             e.printStackTrace();

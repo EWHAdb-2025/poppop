@@ -113,15 +113,39 @@ public class CompanyRepository {
         }
     }
 
-    private CompanyInfo mapResultSetToCompany(ResultSet rs) throws SQLException {
-        CompanyInfo company = new CompanyInfo();
-        company.setId(rs.getInt("id"));
-        company.setUserId(rs.getInt("user_id"));
-        company.setCompanyName(rs.getString("company_name"));
-        company.setBusinessNumber(rs.getString("business_number"));
-        company.setRepresentativeName(rs.getString("representative_name"));
-        company.setRepresentativePhone(rs.getString("representative_phone"));
-        company.setAddress(rs.getString("address"));
-        return company;
+    public Optional<List<CompanyInfo>> findAllProcessorCompanies() {
+        List<CompanyInfo> companies = new ArrayList<>();
+        String sql = """
+        SELECT * FROM (
+            SELECT u.user_id, u.email,
+                   (SELECT c.name FROM DB2025_COMPANY c WHERE c.user_id = u.user_id) AS company_name
+            FROM DB2025_USER u
+            WHERE u.role = 'PROCESSOR'
+        ) AS processor_company
+    """;
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                CompanyInfo info = new CompanyInfo();
+                info.setUserId(rs.getInt("user_id"));
+                info.setCompanyName(rs.getString("company_name"));
+                info.setBusinessNumber(rs.getString("business_number"));
+                info.setRepresentativeName(rs.getString("representative_name"));
+                info.setRepresentativePhone(rs.getString("representative_phone"));
+                info.setAddress(rs.getString("address"));
+                companies.add(info);
+            }
+
+            return Optional.of(companies); // 빈 리스트라도 감싸서 반환
+
+        } catch (SQLException e) {
+            System.out.println("처리업체 회사 목록 조회 중 오류 발생: " + e.getMessage());
+        }
+
+        return Optional.empty(); // 예외 발생 시
     }
+
+
 }

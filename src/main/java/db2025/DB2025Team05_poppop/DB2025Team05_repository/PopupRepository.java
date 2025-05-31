@@ -164,8 +164,33 @@ public class PopupRepository {
         }
     }
 
-//TODO
-//    public List<PopupManagement> findAllPopupStores() {
-//    }
+    public Optional<List<PopupManagement>> findAllPopupStores() {
+        List<PopupManagement> popups = new ArrayList<>();
+        String sql = "SELECT * FROM DB2025_POPUP_MANAGEMENT";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                PopupManagement popup = new PopupManagement();
+                popup.setPopupId(rs.getInt("id"));
+                popup.setName(rs.getString("name"));
+                popup.setAddress(rs.getString("address"));
+                popup.setStartDate(rs.getDate("start_date").toLocalDate());
+                popup.setEndDate(rs.getDate("end_date").toLocalDate());
+                popup.setUserId(rs.getInt("user_id"));
+                popups.add(popup);
+            }
+
+            return Optional.of(popups); // empty list도 감싸서 Optional로 반환
+
+        } catch (SQLException e) {
+            System.out.println("팝업스토어 전체 조회 중 오류 발생: " + e.getMessage());
+        }
+
+        return Optional.empty(); // 오류 발생 시
+    }
+
+
 }
 
