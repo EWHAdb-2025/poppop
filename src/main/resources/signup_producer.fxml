@@ -1,22 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<VBox alignment="CENTER" prefHeight="271.0" prefWidth="400" spacing="12" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.SignupProducerController">
+<VBox alignment="CENTER"
+      prefHeight="271.0" prefWidth="400" spacing="12"
+      xmlns="http://javafx.com/javafx/17.0.12"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.SignupProducerController">
 
     <children>
-        <Label style="-fx-font-size: 20px;" text="PRODUCER 필수입력사항" />
-
-        <TextField fx:id="bizNumberField" promptText="사업자등록번호" />
-        <TextField fx:id="companyNameField" promptText="상호명" />
-        <TextField fx:id="ceoNameField" promptText="대표자 이름" />
-        <TextField fx:id="ceoPhoneField" promptText="대표자 연락처" />
+        <Label style="-fx-font-size: 20px;" text="PRODUCER 필수 입력사항"/>
 
 
-        <Button fx:id="registerButton" onAction="#handleRegister" text="회원가입" />
-        <Label fx:id="messageLabel" style="-fx-text-fill: red;" text="" />
+        <TextField fx:id="bizNumberField"
+                   promptText="사업자등록번호 (10자리)"/>
+
+
+        <TextField fx:id="companyNameField"
+                   promptText="상호명"/>
+
+
+        <TextField fx:id="ceoNameField"
+                   promptText="대표자 이름"/>
+
+
+        <TextField fx:id="ceoPhoneField"
+                   promptText="대표자 연락처"/>
+
+
+        <Button fx:id="registerButton" text="회원가입"
+                onAction="#handleRegister"/>
+        <Button fx:id="backButton" text="이전"
+                onAction="#handleBack"/>
+
+
+        <Label fx:id="messageLabel" style="-fx-text-fill: red;"/>
     </children>
 </VBox>

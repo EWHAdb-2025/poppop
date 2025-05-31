@@ -5,11 +5,14 @@ import db2025.DB2025Team05_poppop.DB2025Team05_repository.*;
 import db2025.DB2025Team05_poppop.DB2025Team05_service.DisposalService;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,6 +25,9 @@ public class DisposalStatsController extends BaseController {
     @FXML private Button companyStatsBtn;
     @FXML private Button popupStatsBtn;
     @FXML private Button monthStatsBtn;
+    @FXML
+    private Button backButton;
+    @FXML private Label messageLabel;
 
     private int managerId;
 
@@ -33,6 +39,7 @@ public class DisposalStatsController extends BaseController {
 
     @FXML
     public void initialize() {
+        super.initialize();
         try {
             service = new DisposalService(
                     new DispRecRepository(),
@@ -45,6 +52,29 @@ public class DisposalStatsController extends BaseController {
             e.printStackTrace();
             showAlert("서비스 초기화 중 오류 발생");
         }
+    }
+
+    @FXML
+    private void handleBack(ActionEvent event) {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/manager_home.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Manager 홈");
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            setError("이전 화면으로 돌아가는 데 실패했습니다.");
+        }
+    }
+
+    private void setError(String msg) {
+        messageLabel.setStyle("-fx-text-fill: red;");
+        messageLabel.setText(msg);
+    }
+    private void setSuccess(String msg) {
+        messageLabel.setStyle("-fx-text-fill: green;");
+        messageLabel.setText(msg);
     }
 
     @FXML

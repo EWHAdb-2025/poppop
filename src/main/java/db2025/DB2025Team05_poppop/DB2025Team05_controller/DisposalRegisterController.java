@@ -7,9 +7,15 @@ import db2025.DB2025Team05_poppop.DB2025Team05_service.DisposalService;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.stage.Stage;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -18,13 +24,19 @@ import java.util.stream.Collectors;
 
 public class DisposalRegisterController extends BaseController {
 
-    @FXML private ComboBox<String> popupComboBox;
-    @FXML private ComboBox<String> companyComboBox;
-    @FXML private DatePicker disposalDate;
-    @FXML private ComboBox<String> statusComboBox;
-    @FXML private Label messageLabel;
+    @FXML
+    private ComboBox<String> popupComboBox;
+    @FXML
+    private ComboBox<String> companyComboBox;
+    @FXML
+    private DatePicker disposalDate;
+    @FXML
+    private ComboBox<String> statusComboBox;
+    @FXML
+    private Label messageLabel;
+    @FXML
+    private Button backButton;
 
-    private int managerId;
 
     private final DisposalService disposalService = new DisposalService(
             new DispRecRepository(),
@@ -33,91 +45,141 @@ public class DisposalRegisterController extends BaseController {
             new WasteRepository(),
             new CompanyRepository()
     );
+    private final CompanyRepository companyRepository = new CompanyRepository();
+    private final DispRecRepository dispRecRepository = new DispRecRepository();
 
-    // 이름 → ID 매핑
+    // Maps for name → ID
     private final Map<String, Integer> processorCompanyNameToId = new HashMap<>();
     private final Map<String, Integer> popupNameToId = new HashMap<>();
 
-    public DisposalRegisterController() throws SQLException {
-    }
+    public DisposalRegisterController() throws SQLException {}
 
-    public void setManagerId(int id) {
-        this.managerId = id;
-    }
 
     @FXML
     public void initialize() {
+        super.initialize();
+
         try {
+            System.out.println("[Init] Start");
+
             Optional<List<CompanyInfo>> processors = disposalService.getAllProcessCompanies();
             Optional<List<PopupManagement>> popups = disposalService.getAllPopupStores();
 
             List<String> processorNames = new ArrayList<>();
             if (processors.isPresent()) {
                 for (CompanyInfo company : processors.get()) {
+                    System.out.println("[Init] Loaded processor: " + company.getCompanyName() + " (userId: " + company.getId() + ")");
                     processorCompanyNameToId.put(company.getCompanyName(), company.getId());
                     processorNames.add(company.getCompanyName());
                 }
+            } else {
+                System.out.println("[Init] No processor companies found");
             }
             companyComboBox.setItems(FXCollections.observableArrayList(processorNames));
 
             List<String> popupNames = new ArrayList<>();
             if (popups.isPresent()) {
                 for (PopupManagement popup : popups.get()) {
+                    System.out.println("[Init] Loaded popup: " + popup.getName() + " (popupId: " + popup.getPopupId() + ")");
                     popupNameToId.put(popup.getName(), popup.getPopupId());
                     popupNames.add(popup.getName());
                 }
+            } else {
+                System.out.println("[Init] No popup stores found");
             }
             popupComboBox.setItems(FXCollections.observableArrayList(popupNames));
 
             statusComboBox.setItems(FXCollections.observableArrayList("완료", "대기", "보류"));
 
+            System.out.println("[Init] Complete");
+
+        } catch (Exception e) {
+            System.out.println("[Init Error] " + e.getMessage());
+            e.printStackTrace();
+            messageLabel.setText("Error during initialization: " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleBack(ActionEvent event) {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/manager_home.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Manager 홈");
+            stage.show();
         } catch (Exception e) {
             e.printStackTrace();
-            messageLabel.setText("초기화 중 오류 발생: " + e.getMessage());
+            setError("이전 화면으로 돌아가는 데 실패했습니다.");
         }
+    }
 
+    private void setError(String msg) {
+        messageLabel.setStyle("-fx-text-fill: red;");
+        messageLabel.setText(msg);
+    }
+    private void setSuccess(String msg) {
+        messageLabel.setStyle("-fx-text-fill: green;");
+        messageLabel.setText(msg);
     }
 
     @FXML
     private void handleRegister(ActionEvent event) {
+        System.out.println("[Register Start]");
         String selectedPopupName = popupComboBox.getValue();
         String selectedProcessCompanyName = companyComboBox.getValue();
         LocalDate date = disposalDate.getValue();
         String status = statusComboBox.getValue();
 
+        System.out.println("[Register] Selected popup: " + selectedPopupName);
+        System.out.println("[Register] Selected company: " + selectedProcessCompanyName);
+        System.out.println("[Register] Selected date: " + date);
+        System.out.println("[Register] Selected status: " + status);
+
         if (selectedProcessCompanyName == null || selectedPopupName == null || date == null || status == null) {
+            System.out.println("[Register Error] Missing required fields");
             messageLabel.setStyle("-fx-text-fill: red;");
-            messageLabel.setText("모든 항목을 입력해주세요.");
+            messageLabel.setText("Please fill in all fields.");
             return;
         }
 
         try {
-            Integer userId = processorCompanyNameToId.get(selectedProcessCompanyName);
+            Integer companyId = processorCompanyNameToId.get(selectedProcessCompanyName);
             Integer popupId = popupNameToId.get(selectedPopupName);
+            Integer userId = companyRepository.findUserIdByCompanyName(selectedProcessCompanyName);
+
+            System.out.println("[Register] Retrieved companyId: " + companyId + ", popupId: " + popupId + ", userId: " + userId);
 
             Waste waste = new Waste();
             waste.setAmount(1);
-            waste.setType("기본폐기물");
+            waste.setType("Basic Waste");
+
 
             DisposalRecord record = new DisposalRecord();
             record.setUserId(userId);
             record.setPopupId(popupId);
             record.setDisposalDate(date.atStartOfDay());
             record.setStatus(status);
-            record.setWasteId(0); // validateDisposalInput에서 처리
+            record.setWasteId(1); // Handled in validateDisposalInput
 
-            disposalService.registerDisposalRecord(record, waste, managerId);
+            System.out.println("[Register] Record created, ready to register");
 
+            disposalService.registerDisposalRecord(record, waste, currentUser.getId());
+
+            System.out.println("[Register Complete] Disposal record successfully registered");
             messageLabel.setStyle("-fx-text-fill: green;");
-            messageLabel.setText("처리 이력 등록 성공!");
+            messageLabel.setText("Disposal record registered successfully!");
 
         } catch (BusinessException e) {
+            System.out.println("[BusinessException] " + e.getMessage());
             messageLabel.setStyle("-fx-text-fill: red;");
             messageLabel.setText(e.getMessage());
         } catch (Exception e) {
+            System.out.println("[SystemException] " + e.getMessage());
             e.printStackTrace();
             messageLabel.setStyle("-fx-text-fill: red;");
-            messageLabel.setText("시스템 오류 발생");
+            messageLabel.setText("System error occurred");
         }
     }
 }
+

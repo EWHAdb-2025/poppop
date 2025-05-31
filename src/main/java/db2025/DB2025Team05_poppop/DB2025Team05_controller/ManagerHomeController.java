@@ -1,19 +1,48 @@
 package db2025.DB2025Team05_poppop.DB2025Team05_controller;
 
+import db2025.DB2025Team05_poppop.DB2025Team05_repository.*;
+import db2025.DB2025Team05_poppop.DB2025Team05_service.DisposalService;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 public class ManagerHomeController extends BaseController {
+    @FXML
+    private Button backButton;
+    @FXML private Label messageLabel;
 
-    private int managerId; // 필요 시 로그인 시점에서 주입
+    @FXML
+    public void initialize() {
+        super.initialize();
+    }
 
-    public void setManagerId(int id) {
-        this.managerId = id;
+    @FXML
+    private void handleBack(ActionEvent event) {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/manager_home.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Manager 홈");
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            setError("이전 화면으로 돌아가는 데 실패했습니다.");
+        }
+    }
+
+    private void setError(String msg) {
+        messageLabel.setStyle("-fx-text-fill: red;");
+        messageLabel.setText(msg);
+    }
+    private void setSuccess(String msg) {
+        messageLabel.setStyle("-fx-text-fill: green;");
+        messageLabel.setText(msg);
     }
 
     @FXML

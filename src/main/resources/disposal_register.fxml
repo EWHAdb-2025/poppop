@@ -1,27 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<VBox alignment="CENTER" prefHeight="300" prefWidth="400" spacing="12"
-      xmlns="http://javafx.com/javafx/21.0.1"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.DisposalRegisterController">
+<VBox alignment="CENTER" prefHeight="300" prefWidth="400" spacing="12" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.DisposalRegisterController">
 
     <children>
         <Label style="-fx-font-size: 20px;" text="폐기물 처리 이력 입력">
             <font>
                 <Font size="24.0" />
-            </font>
-        </Label>
+            </font></Label>
 
         <ComboBox fx:id="popupComboBox" editable="true" prefWidth="150.0" promptText="팝업스토어 선택" />
-        <ComboBox fx:id="companyComboBox" editable="true" prefWidth="150.0" promptText="처리 업체 선택" />
+        <ComboBox fx:id="processorComboBox" editable="true" prefWidth="150.0" promptText="처리 업체 선택" />
+
+        <TextField fx:id="wasteTypeField" prefWidth="200"
+                   promptText="폐기물 타입 입력"/>
+
+        <TextField fx:id="amountField" prefWidth="200"
+                   promptText="처리량 (kg) 입력"/>
         <DatePicker fx:id="disposalDate" promptText="처리 일자 선택" />
         <ComboBox fx:id="statusComboBox" editable="true" prefWidth="150.0" promptText="처리 상태 선택" />
 
+
         <Button onAction="#handleRegister" text="등록" />
+        <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="이전" />
         <Label fx:id="messageLabel" style="-fx-text-fill: red;" text="" />
     </children>
 </VBox>

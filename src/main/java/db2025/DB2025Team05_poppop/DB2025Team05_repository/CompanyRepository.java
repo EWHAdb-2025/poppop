@@ -67,6 +67,24 @@ public class CompanyRepository {
         return Optional.empty();
     }
 
+    // company name으로 user_id 조회
+    public Integer findUserIdByCompanyName(String companyName) {
+        String sql = "SELECT user_id FROM DB2025_COMPANY_INFO WHERE company_name = ?";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, companyName);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("user_id");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("회사 정보 조회 중 오류 발생: " + e.getMessage());
+        }
+        return null; // 조회 실패 시 null 반환
+    }
+
+
+
     // 동적 쿼리 사용해 수정된 필드만 update
     public boolean updateCompanyInfo(CompanyInfo comp) {
         StringBuilder sql = new StringBuilder("update DB2025_COMPANY_INFO set ");
@@ -115,23 +133,17 @@ public class CompanyRepository {
 
     public Optional<List<CompanyInfo>> findAllProcessorCompanies() {
         List<CompanyInfo> companies = new ArrayList<>();
-        String sql = """
-        SELECT * FROM (
-            SELECT u.user_id, u.email,
-                   (SELECT c.name FROM DB2025_COMPANY c WHERE c.user_id = u.user_id) AS company_name
-            FROM DB2025_USER u
-            WHERE u.role = 'PROCESSOR'
-        ) AS processor_company
-    """;
+        String sql = "SELECT * FROM DB2025_COMPANY_INFO WHERE user_id IN (SELECT id FROM DB2025_USER WHERE role = 'PROCESSOR')";
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
 
             while (rs.next()) {
                 CompanyInfo info = new CompanyInfo();
+                info.setId(rs.getInt("id"));
                 info.setUserId(rs.getInt("user_id"));
-                info.setCompanyName(rs.getString("company_name"));
                 info.setBusinessNumber(rs.getString("business_number"));
+                info.setCompanyName(rs.getString("company_name"));
                 info.setRepresentativeName(rs.getString("representative_name"));
                 info.setRepresentativePhone(rs.getString("representative_phone"));
                 info.setAddress(rs.getString("address"));
