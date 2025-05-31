@@ -44,7 +44,7 @@ public class UserService {
      * - MAX_COMPANY_NAME_LENGTH: 회사명 최대 길이 (100자)
      */
     private static final class Constants {
-        private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
+        private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$"); //사업자번호는 10자리
         private static final Pattern BUSINESS_NUMBER_PATTERN = Pattern.compile("^\\d{10}$");
         private static final int MIN_NAME_LENGTH = 2;
         private static final int MAX_NAME_LENGTH = 50;
@@ -93,8 +93,21 @@ public class UserService {
         }
     }
 
+    //로그인
+    public User loginWithEmail(String email) {
+        try {
+            Optional<User> userOpt = userRepository.findByEmail(email);
+            if (userOpt.isEmpty()) {
+                throw new BusinessException(ErrorCode.USER_NOT_FOUND, "등록되지 않은 이메일입니다.");
+            }
+            return userOpt.get();
+        } catch (SQLException e) {
+            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR, "로그인 중 오류 발생: " + e.getMessage());
+        }
+    }
+
     /**
-     * 폐기물 처리 업체 등록 (관리자 전용)
+     * 폐기물 처리 업체 등록 (MANAGER 전용)
      * 
      * 처리 과정:
      * 1. 관리자 권한 확인
@@ -112,13 +125,16 @@ public class UserService {
     @Transactional
     public User registerProcessor(int managerId, User user, CompanyInfo companyInfo) {
         try {
-            validateManagerPermission(managerId);
+            //1. validate
+            validateRole(managerId, Role.MANAGER); //매니저인지 확인
             validateRegistrationInput(user, companyInfo);
             checkEmailDuplicate(user.getEmail());
             checkBusinessNumberDuplicate(companyInfo.getBusinessNumber());
-            
+
+            //2. user에 넣기
             user.setRole(Role.PROCESSOR);
             User savedUser = saveUser(user);
+            //3. 회사에 넣기
             saveCompanyInfo(savedUser.getId(), companyInfo);
             
             return savedUser;
@@ -265,15 +281,16 @@ public class UserService {
     }
 
     /**
-     * 관리자 권한 확인
+     * 권한 확인
      * 
-     * @param managerId 확인할 관리자 ID
+     * @param userId
+     * @param  role 확인할 role
      * @throws BusinessException 관리자가 아니거나 존재하지 않는 경우
      */
-    private void validateManagerPermission(int managerId) throws SQLException {
-        Optional<User> managerOpt = userRepository.findByUserId(managerId);
-        if (managerOpt.isEmpty() || managerOpt.get().getRole() != Role.MANAGER) {
-            throw new BusinessException(ErrorCode.INVALID_ROLE, "관리자만 폐기물 처리 업체를 등록할 수 있습니다.");
+    private void validateRole(int userId, Role role) throws SQLException {
+        Optional<User> managerOpt = userRepository.findByUserId(userId);
+        if (managerOpt.isEmpty() || managerOpt.get().getRole() != role) {
+            throw new BusinessException(ErrorCode.INVALID_ROLE, "해당하는 역할의 userID가 아닙니다.");
         }
     }
 
@@ -344,13 +361,14 @@ public class UserService {
     /**
      * 회사 정보 저장
      * 
-     * @param userId 사용자 ID
+     * @param userId 사용자 ID(폐기물 처리 업체일 경우, 등록한 MANAGER / producer일 경우, 주인(producer))
      * @param companyInfo 저장할 회사 정보
      * @throws BusinessException 저장 실패 시
      */
     private void saveCompanyInfo(int userId, CompanyInfo companyInfo) throws SQLException {
         companyInfo.setUserId(userId);
-        if (companyRepository.insertCompanyInfo(companyInfo) == null) {
+
+        if (!companyRepository.insertCompanyInfo(companyInfo.getUserId(), companyInfo.getCompanyName(), companyInfo.getBusinessNumber(), companyInfo.getRepresentativeName(), companyInfo.getRepresentativePhone())) {
             throw new BusinessException(ErrorCode.COMPANY_REGISTRATION_FAILED);
         }
     }

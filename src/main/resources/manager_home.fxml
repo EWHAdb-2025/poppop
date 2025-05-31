@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefWidth="960" prefHeight="540"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.ManagerHomeController"
+            stylesheets="@/css/styles.css">
+
+    <children>
+        <VBox alignment="CENTER" spacing="20"
+              layoutX="180" layoutY="90" prefWidth="600" prefHeight="360"
+              styleClass="card">
+
+            <children>
+                <Label text="Manager Home" styleClass="label-title" />
+
+                <Button fx:id="registerProcessorBtn" onAction="#handleRegisterProcessor"
+                        text="처리자 등록" styleClass="button-primary" />
+                <Button fx:id="disposalRecordBtn" onAction="#handleDisposalRecord"
+                        text="폐기물 처리 이력 입력" styleClass="button-primary" />
+                <Button fx:id="statisticsBtn" onAction="#handleStatistics"
+                        text="폐기물 통계 조회" styleClass="button-primary" />
+
+                <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack"
+                        text="이전" styleClass="button-secondary" />
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

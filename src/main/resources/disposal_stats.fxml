@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefWidth="960" prefHeight="540"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.DisposalStatsController"
+            stylesheets="@/css/styles.css">
+
+    <children>
+        <VBox alignment="CENTER" spacing="16"
+              layoutX="180" layoutY="30" prefWidth="600" prefHeight="480"
+              styleClass="card">
+
+            <children>
+
+                <Label text="폐기물 처리 통계 조회" styleClass="label-title" />
+
+                <HBox alignment="CENTER" spacing="10">
+                    <children>
+                        <ComboBox fx:id="companyComboBox" editable="true" promptText="회사명 선택" styleClass="input" />
+                        <Button onAction="#handleCompanySearch" text="검색" styleClass="button-primary" />
+                    </children>
+                </HBox>
+
+                <HBox alignment="CENTER" spacing="10">
+                    <children>
+                        <ComboBox fx:id="popupComboBox" editable="true" promptText="팝업스토어 선택" styleClass="input" />
+                        <Button onAction="#handlePopupSearch" text="검색" styleClass="button-primary" />
+                    </children>
+                </HBox>
+
+                <HBox alignment="CENTER" spacing="10">
+                    <children>
+                        <Button fx:id="clearCompanyBtn" text="회사 선택 취소" onAction="#handleClearCompany" styleClass="button-secondary" />
+                        <Button fx:id="clearPopupBtn" text="팝업 선택 취소" onAction="#handleClearPopup" styleClass="button-secondary" />
+                    </children>
+                </HBox>
+
+                <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="이전" styleClass="button-secondary" />
+
+                <TableView fx:id="statsTableView" prefHeight="250" prefWidth="550">
+                    <columns>
+                        <TableColumn prefWidth="287.0" text="구분" />
+                        <TableColumn prefWidth="307.0" text="총 처리 건수" />
+                    </columns>
+                </TableView>
+
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

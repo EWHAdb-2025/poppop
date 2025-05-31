@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefWidth="960" prefHeight="540"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.MyPopupListController"
+            stylesheets="@/css/styles.css">
+
+    <top>
+        <Label text="My PopStore"
+               BorderPane.alignment="CENTER"
+               styleClass="label-title"
+               style="-fx-padding: 20 0 10 0;" />
+    </top>
+
+    <center>
+        <TableView fx:id="popupTable" prefHeight="340" prefWidth="800" style="-fx-padding: 10;">
+            <columns>
+                <TableColumn fx:id="colName" prefWidth="180" text="팝업명" />
+                <TableColumn fx:id="colAddress" prefWidth="240" text="주소" />
+                <TableColumn fx:id="colStartDate" prefWidth="190" text="시작일" />
+                <TableColumn fx:id="colEndDate" prefWidth="190" text="종료일" />
+            </columns>
+        </TableView>
+    </center>
+
+    <bottom>
+        <HBox alignment="CENTER" spacing="12"
+              BorderPane.alignment="CENTER"
+              style="-fx-padding: 20 0 30 0;">
+            <Button fx:id="backButton" text="이전" onAction="#handleBack" styleClass="button-secondary" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button fx:id="editButton" text="수정" onAction="#handleEdit" styleClass="button-primary" />
+            <Button fx:id="deleteButton" text="삭제" onAction="#handleDelete" styleClass="button-danger" />
+        </HBox>
+    </bottom>
+
+</BorderPane>

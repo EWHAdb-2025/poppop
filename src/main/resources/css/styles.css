@@ -1,0 +1,95 @@
+/* 폰트 및 기본 배경 정의 */
+.root {
+    -fx-font-family: 'Segoe UI', 'Noto Sans KR';
+    -fx-background-color: #fbfdfa;
+}
+
+/* 공통 제목 라벨 */
+.label-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1b5e20;
+}
+
+/* 에러 메시지 라벨 */
+.label-error {
+    -fx-text-fill: #d32f2f;
+    -fx-font-size: 12px;
+    -fx-font-family: 'Segoe UI', 'Noto Sans KR';
+}
+
+/* 입력창, 콤보박스 공통 */
+.input {
+    -fx-pref-width: 300px;
+    -fx-background-radius: 10;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 8 12;
+}
+
+/* 버튼 공통 */
+.button-primary {
+    -fx-background-color: #2e7d32;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-padding: 8 20;
+}
+.button-secondary {
+    -fx-background-color: #9e9e9e;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-padding: 8 20;
+}
+
+/* 토글 버튼 */
+.toggle-green {
+    -fx-background-color: #e3f2df;
+    -fx-border-color: #2e7d32;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-text-fill: #1b5e20;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-padding: 6 18;
+}
+
+/* 카드 레이아웃 박스 (중앙 콘텐츠 영역) */
+.card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 16;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 16;
+    -fx-padding: 36;
+}
+
+/* 서브 제목 라벨 (팝업 설명용) */
+.label-subtitle {
+    -fx-font-size: 16px;
+    -fx-text-fill: #333;
+    -fx-font-family: 'Segoe UI', 'Noto Sans KR';
+    -fx-font-weight: bold;
+}
+
+/* 위험(삭제) 버튼용 */
+.button-danger {
+    -fx-background-color: #d84a4a;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-background-radius: 10;
+    -fx-padding: 8 20;
+}
+
+.label-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333;
+    -fx-font-weight: normal;
+}
+
+
+
+

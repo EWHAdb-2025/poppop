@@ -15,36 +15,39 @@ public class WasteRepository {
     }
 
     // insert
-    public boolean insertWaste(Waste waste) {
-        String sql = "insert into Waste(waste_id, waste_amount, waste_type) values (?, ?, ?)";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, waste.getId());
-            if (waste.getAmount() != null) {
-                pstmt.setInt(2, waste.getAmount());
-            } else {
-                pstmt.setNull(2, Types.INTEGER);
+    public Waste insertWaste(Waste waste) throws SQLException {
+        String sql = "insert into DB2025_WASTE(amount, type) values (?, ?)";
+        try (PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setInt(1, waste.getAmount());
+            pstmt.setString(2, waste.getType());
+            
+            int affectedRows = pstmt.executeUpdate();
+            if (affectedRows == 0) {
+                return null;
             }
-            pstmt.setString(3, waste.getType());
-            pstmt.executeUpdate();
-            return true;
-        } catch (SQLException e) {
-            System.out.println("폐기물 삽입 오류: " + e.getMessage());
-            e.printStackTrace();
-            return false;
+
+            try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    waste.setId(generatedKeys.getInt(1));
+                    return waste;
+                } else {
+                    return null;
+                }
+            }
         }
     }
 
     // search
     public Optional<Waste> findByWasteId(int id) {
-        String sql = "select * from Waste where waste_id = ?";
+        String sql = "select * from DB2025_WASTE where id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 Waste waste = Waste.builder()
-                    .id(rs.getInt("waste_id"))
-                    .amount(rs.getInt("waste_amount"))
-                    .type(rs.getString("waste_type"))
+                    .id(rs.getInt("id"))
+                    .amount(rs.getInt("amount"))
+                    .type(rs.getString("type"))
                     .build();
                 return Optional.of(waste);
             }
@@ -55,18 +58,14 @@ public class WasteRepository {
         return Optional.empty();
     }
 
-    // search total amount
+    // 폐기물 type별 amount 조회
     public Optional<Map<String, Integer>> getTotalWasteAmountByType() {
-        String sql = """
-            SELECT waste_type, SUM(waste_amount) AS total_amount
-            FROM Waste
-            GROUP BY waste_type
-        """;
+        String sql = "select type, SUM(waste_amount) as total_amount from DB2025_WASTE group_by type";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             ResultSet rs = pstmt.executeQuery();
             Map<String, Integer> result = new HashMap<>();
             while (rs.next()) {
-                result.put(rs.getString("waste_type"), rs.getInt("total_amount"));
+                result.put(rs.getString("type"), rs.getInt("total_amount"));
             }
             return Optional.of(result);
         } catch (SQLException e) {
@@ -77,7 +76,7 @@ public class WasteRepository {
 
     // delete
     public boolean deleteWaste(int id) {
-        String sql = "delete from Waste where waste_id = ?";
+        String sql = "delete from DB2025_WASTE where id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             int rowsDeleted = pstmt.executeUpdate();
@@ -91,15 +90,15 @@ public class WasteRepository {
 
     // update(dynamic query)
     public boolean updateWaste(Waste waste) {
-        StringBuilder sql = new StringBuilder("update Waste set ");
+        StringBuilder sql = new StringBuilder("update DB2025_WASTE set ");
         List<Object> params = new ArrayList<>();
 
         if (waste.getAmount() != null) {
-            sql.append("waste_amount = ?, ");
+            sql.append("amount = ?, ");
             params.add(waste.getAmount());
         }
         if (waste.getType() != null && !waste.getType().isBlank()) {
-            sql.append("waste_type = ?, ");
+            sql.append("type = ?, ");
             params.add(waste.getType());
         }
 
@@ -109,7 +108,7 @@ public class WasteRepository {
         }
 
         sql.setLength(sql.length() - 2);
-        sql.append(" WHERE waste_id = ?");
+        sql.append(" WHERE id = ?");
         params.add(waste.getId());
 
         try (PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {

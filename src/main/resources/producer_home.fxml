@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefWidth="960" prefHeight="540"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.ProducerHomeController"
+            stylesheets="@/css/styles.css">
+
+    <children>
+        <VBox alignment="CENTER" spacing="20" layoutX="180" layoutY="100"
+              prefWidth="600" prefHeight="320" styleClass="card">
+
+            <children>
+                <Label text="Producer Home" styleClass="label-title" />
+
+                <Button fx:id="registerPopupBtn" onAction="#handleRegisterPopup" text="팝업스토어 등록" styleClass="button-primary" />
+                <Button fx:id="myPopBtn" onAction="#handleViewMyPopup" text="내 팝업 보기" styleClass="button-primary" />
+                <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBack" text="이전" styleClass="button-secondary" />
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

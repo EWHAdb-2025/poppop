@@ -6,11 +6,11 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 public class DisposalRecord {
     private int disposalId;
-    private int userId;
+    private int userId; // 폐기물 처리 업체의 user id
     private int popupId;
     private int wasteId;
     private String status;

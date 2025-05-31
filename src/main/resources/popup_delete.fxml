@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<AnchorPane prefWidth="600" prefHeight="360"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="db2025.DB2025Team05_poppop.DB2025Team05_controller.PopupDeleteController"
+            stylesheets="@/css/styles.css">
+
+    <children>
+        <VBox alignment="CENTER" spacing="18" layoutX="60" layoutY="60" prefWidth="480" prefHeight="240"
+              styleClass="card">
+
+            <!-- 설명 라벨 -->
+            <Label fx:id="infoLabel" wrapText="true" text="선택한 팝업을 정말 삭제하시겠습니까?"
+                   styleClass="label-subtitle" />
+
+            <!-- 버튼 -->
+            <HBox alignment="CENTER" spacing="12">
+                <Button fx:id="cancelButton" text="취소" onAction="#handleCancel" styleClass="button-secondary" />
+                <Button fx:id="deleteButton" text="삭제" onAction="#handleDelete" styleClass="button-danger" />
+            </HBox>
+
+            <!-- 메시지 -->
+            <Label fx:id="messageLabel" text="" styleClass="label-error" />
+
+        </VBox>
+    </children>
+</AnchorPane>

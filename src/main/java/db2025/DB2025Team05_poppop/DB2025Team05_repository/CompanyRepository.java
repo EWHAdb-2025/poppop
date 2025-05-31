@@ -16,10 +16,9 @@ public class CompanyRepository {
         this.conn = DBConnection.getConnection();
     }
 
-    public boolean insertCompanyInfo(int userId, String companyName, String businessNumber, 
-                                   String representativeName, String representativePhone) {
-        String sql = "insert INTO CompanyInfo(user_id, company_name, business_number, " +
-                    "representative_name, representative_phone) values (?, ?, ?, ?, ?)";
+    // insert
+    public boolean insertCompanyInfo(int userId, String companyName, String businessNumber, String representativeName, String representativePhone) {
+        String sql = "insert INTO DB2025_COMPANY_INFO(user_id, company_name, business_number, representative_name, representative_phone) values (?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             pstmt.setString(2, companyName);
@@ -34,8 +33,9 @@ public class CompanyRepository {
         }
     }
 
+    // 사업자번호 중복 확인
     public boolean isBusinessNumberDuplicate(String businessNumber) {
-        String sql = "select count(*) from CompanyInfo where business_number = ?";
+        String sql = "select count(*) from DB2025_COMPANY_INFO where business_number = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, businessNumber);
             ResultSet rs = pstmt.executeQuery();
@@ -46,8 +46,9 @@ public class CompanyRepository {
         return false;
     }
 
+    // userid로 검색
     public Optional<Map<String, Object>> findCompanyByUserId(int userId) {
-        String sql = "select * from CompanyInfo where user_id = ?";
+        String sql = "select * from DB2025_COMPANY_INFO where user_id = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, userId);
             ResultSet rs = pstmt.executeQuery();
@@ -66,16 +67,62 @@ public class CompanyRepository {
         return Optional.empty();
     }
 
-    public boolean updateCompanyInfo(int userId, String companyName, String businessNumber,
-                                   String representativeName, String representativePhone) {
-        String sql = "update CompanyInfo set company_name = ?, business_number = ?, " +
-                    "representative_name = ?, representative_phone = ? where user_id = ?";
+    // company name으로 user_id 조회
+    public Integer findUserIdByCompanyName(String companyName) {
+        String sql = "SELECT user_id FROM DB2025_COMPANY_INFO WHERE company_name = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, companyName);
-            pstmt.setString(2, businessNumber);
-            pstmt.setString(3, representativeName);
-            pstmt.setString(4, representativePhone);
-            pstmt.setInt(5, userId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("user_id");
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("회사 정보 조회 중 오류 발생: " + e.getMessage());
+        }
+        return null; // 조회 실패 시 null 반환
+    }
+
+
+
+    // 동적 쿼리 사용해 수정된 필드만 update
+    public boolean updateCompanyInfo(CompanyInfo comp) {
+        StringBuilder sql = new StringBuilder("update DB2025_COMPANY_INFO set ");
+        List<Object> params = new ArrayList<>();
+
+        if (comp.getCompanyName() != null) {
+            sql.append("company_name = ?, ");
+            params.add(comp.getCompanyName());
+        }
+        if (comp.getAddress() !=null){
+            sql.append("address = ?,");
+            params.add(comp.getAddress());
+        }
+        if (comp.getBusinessNumber() != null) {
+            sql.append("business_number = ?, ");
+            params.add(comp.getBusinessNumber());
+        }
+        if (comp.getRepresentativeName() != null) {
+            sql.append("representative_name = ?, ");
+            params.add(comp.getRepresentativeName());
+        }
+        if(comp.getRepresentativePhone() !=null){
+            sql.append("representative_phone = ?, ");
+            params.add(comp.getRepresentativePhone());
+        }
+        if (params.isEmpty()) {
+            System.out.println("수정할 필드가 없습니다.");
+            return false;
+        }
+
+        sql.setLength(sql.length() - 2);
+        sql.append("where id = ?");
+        params.add(comp.getId());
+
+        try (PreparedStatement pstmt = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                pstmt.setObject(i + 1, params.get(i));
+            }
             int rowsUpdated = pstmt.executeUpdate();
             return rowsUpdated > 0;
         } catch (SQLException e) {
@@ -84,71 +131,33 @@ public class CompanyRepository {
         }
     }
 
-    /**
-     * 회사 정보 저장
-     * @param companyInfo 저장할 회사 정보
-     * @return 저장된 회사 정보 (실패 시 null)
-     * @throws SQLException 데이터베이스 오류 발생 시
-     */
-    public CompanyInfo insertCompanyInfo(CompanyInfo companyInfo) throws SQLException {
-        String sql = "INSERT INTO CompanyInfo (user_id, company_name, business_number, representative_name, representative_phone, address) VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, companyInfo.getUserId());
-            pstmt.setString(2, companyInfo.getCompanyName());
-            pstmt.setString(3, companyInfo.getBusinessNumber());
-            pstmt.setString(4, companyInfo.getRepresentativeName());
-            pstmt.setString(5, companyInfo.getRepresentativePhone());
-            pstmt.setString(6, companyInfo.getAddress());
-            
-            boolean success = pstmt.executeUpdate() > 0;
-            return success ? companyInfo : null;
-        }
-    }
+    public Optional<List<CompanyInfo>> findAllProcessorCompanies() {
+        List<CompanyInfo> companies = new ArrayList<>();
+        String sql = "SELECT * FROM DB2025_COMPANY_INFO WHERE user_id IN (SELECT id FROM DB2025_USER WHERE role = 'PROCESSOR')";
 
-    public CompanyInfo findByUserId(int userId) throws SQLException {
-        String sql = "SELECT * FROM CompanyInfo WHERE user_id = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, userId);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (rs.next()) {
-                    return mapResultSetToCompany(rs);
-                }
+        try (PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                CompanyInfo info = new CompanyInfo();
+                info.setId(rs.getInt("id"));
+                info.setUserId(rs.getInt("user_id"));
+                info.setBusinessNumber(rs.getString("business_number"));
+                info.setCompanyName(rs.getString("company_name"));
+                info.setRepresentativeName(rs.getString("representative_name"));
+                info.setRepresentativePhone(rs.getString("representative_phone"));
+                info.setAddress(rs.getString("address"));
+                companies.add(info);
             }
+
+            return Optional.of(companies); // 빈 리스트라도 감싸서 반환
+
+        } catch (SQLException e) {
+            System.out.println("처리업체 회사 목록 조회 중 오류 발생: " + e.getMessage());
         }
-        return null;
+
+        return Optional.empty(); // 예외 발생 시
     }
 
-    public boolean updateCompany(CompanyInfo company) throws SQLException {
-        String sql = "UPDATE CompanyInfo SET company_name = ?, business_number = ?, representative_name = ?, representative_phone = ?, address = ? WHERE user_id = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, company.getCompanyName());
-            pstmt.setString(2, company.getBusinessNumber());
-            pstmt.setString(3, company.getRepresentativeName());
-            pstmt.setString(4, company.getRepresentativePhone());
-            pstmt.setString(5, company.getAddress());
-            pstmt.setInt(6, company.getUserId());
-            
-            return pstmt.executeUpdate() > 0;
-        }
-    }
 
-    public boolean deleteCompany(int userId) throws SQLException {
-        String sql = "DELETE FROM CompanyInfo WHERE user_id = ?";
-        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setInt(1, userId);
-            return pstmt.executeUpdate() > 0;
-        }
-    }
-
-    private CompanyInfo mapResultSetToCompany(ResultSet rs) throws SQLException {
-        CompanyInfo company = new CompanyInfo();
-        company.setId(rs.getInt("id"));
-        company.setUserId(rs.getInt("user_id"));
-        company.setCompanyName(rs.getString("company_name"));
-        company.setBusinessNumber(rs.getString("business_number"));
-        company.setRepresentativeName(rs.getString("representative_name"));
-        company.setRepresentativePhone(rs.getString("representative_phone"));
-        company.setAddress(rs.getString("address"));
-        return company;
-    }
 }
